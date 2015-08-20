@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -42,7 +44,7 @@ public class PosterGridFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    public static ArrayAdapter<String> mMoviesAdapter;
+    public static ImageAdapter mMoviesAdapter;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -79,6 +81,13 @@ public class PosterGridFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        // Add this line in order for this fragment to handle menu events.
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.poster_grid_fragment_menu, menu);
     }
 
     @Override
@@ -88,7 +97,8 @@ public class PosterGridFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_poster_grid, container, false);
 
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this.getActivity()));
+        mMoviesAdapter = new ImageAdapter(this.getActivity());
+        gridview.setAdapter(mMoviesAdapter);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -129,6 +139,19 @@ public class PosterGridFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            new FetchMoviesTask().execute("popularity.desc");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
 
 
@@ -153,10 +176,11 @@ public class PosterGridFragment extends Fragment {
                         "http://api.themoviedb.org/3/discover/movie?";
                 final String SORT_BY_PARAM = "sort_by";
                 final String API_KEY_PARAM = "api_key";
+                String api_key = getString(R.string.api_key);
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendQueryParameter(SORT_BY_PARAM, params[0])
-                        .appendQueryParameter(API_KEY_PARAM, params[2])
+                        .appendQueryParameter(API_KEY_PARAM, api_key)
                         .build();
 
                 URL url = new URL(builtUri.toString());
@@ -190,7 +214,7 @@ public class PosterGridFragment extends Fragment {
                     return null;
                 }
                 moviesJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Movie JSON" + moviesJsonStr);
+                Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
                 try {
                     return getMovieDataFromJson(moviesJsonStr, numMovies);
                 } catch (JSONException e) {
@@ -223,16 +247,20 @@ public class PosterGridFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getMovieDataFromJson(String moviesJsonStr, int numDays)
+        private String[] getMovieDataFromJson(String moviesJsonStr, int numMovies)
             throws JSONException {
             final String TMDB_RESULTS = "results";
+            final String TMDB_POSTER_PATH = "poster_path";
+
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
-            String[] resultStrs = new String[numDays];
-            for(int i = 0; i < moviesArray.length(); i++) {
+
+            String[] resultStrs = new String[numMovies];
+            for(int i = 0; i < numMovies; i++) {
                 // Get the JSON object representing a movie
                 JSONObject singleMovie = moviesArray.getJSONObject(i);
-                String posterPath = singleMovie.getString("poster_path");
+                Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
+                String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
                 resultStrs[i] = posterPath;
             }
             return resultStrs;
@@ -242,8 +270,8 @@ public class PosterGridFragment extends Fragment {
         protected void onPostExecute(String[] result) {
             if (result != null) {
                 mMoviesAdapter.clear();
-                for(String dayForecastStr : result) {
-                    mMoviesAdapter.add(dayForecastStr);
+                for(String singleMovieStr : result) {
+                    mMoviesAdapter.add(singleMovieStr);
                 }
             }
         }
@@ -252,6 +280,14 @@ public class PosterGridFragment extends Fragment {
 
 class ImageAdapter extends BaseAdapter {
     private Context mContext;
+
+    public void clear() {
+        mThumbIds = new Integer[10];
+    }
+
+    public void add(String str) {
+        mThumbIds[mThumbIds.length] = R.drawable.sample_2;
+    }
 
     public ImageAdapter(Context c) {
         mContext = c;
