@@ -90,12 +90,12 @@ public class PosterGridFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Movie[] doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -179,32 +179,34 @@ public class PosterGridFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getMovieDataFromJson(String moviesJsonStr)
+        private Movie[] getMovieDataFromJson(String moviesJsonStr)
             throws JSONException {
             final String TMDB_RESULTS = "results";
             final String TMDB_POSTER_PATH = "poster_path";
+            final String TMDB_MOVIE_ID = "id";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-            String[] resultStrs = new String[moviesArray.length()];
+            Movie[] resultMovies = new Movie[moviesArray.length()];
             for(int i = 0; i < moviesArray.length(); i++) {
                 // Get the JSON object representing a movie
                 JSONObject singleMovie = moviesArray.getJSONObject(i);
                 Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
                 String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
-                resultStrs[i] = posterPath;
+                long movieId = singleMovie.getLong(TMDB_MOVIE_ID);
+                resultMovies[i] = new Movie(movieId, posterPath);
             }
-            return resultStrs;
+            return resultMovies;
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(Movie[] result) {
             if (result != null) {
                 mMoviesAdapter.clear();
-                for(String singleMovieStr : result) {
-                    Log.v(LOG_TAG, "Adding " + singleMovieStr + " to adapter");
-                    mMoviesAdapter.add(singleMovieStr);
+                for(Movie singleMovie : result) {
+                    Log.v(LOG_TAG, "Adding " + singleMovie + " to adapter");
+                    mMoviesAdapter.add(singleMovie);
                 }
                 mMoviesAdapter.notifyDataSetChanged();
             }
@@ -215,14 +217,12 @@ public class PosterGridFragment extends Fragment {
 class ImageAdapter extends BaseAdapter {
     private Context mContext;
 
-    private final String domainPath = "http://image.tmdb.org/t/p/w185";
-
     public void clear() {
         mThumbIds.clear();
     }
 
-    public void add(String imageURL) {
-        mThumbIds.add( domainPath + imageURL);
+    public void add(Movie movie) {
+        mThumbIds.add(movie);
     }
 
     public ImageAdapter(Context c) {
@@ -251,10 +251,31 @@ class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        Picasso.with(mContext).load(mThumbIds.get(position)).into(imageView);
+        Picasso.with(mContext).load(mThumbIds.get(position).getPosterPath()).into(imageView);
         return imageView;
     }
 
     // references to our images
-    private ArrayList<String> mThumbIds = new ArrayList();
+    private ArrayList<Movie> mThumbIds = new ArrayList();
+}
+
+class Movie {
+
+    private long movieId;
+
+    private String posterPath;
+
+    private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
+
+    // @TODO Set the rest of the required attributes
+
+
+    public Movie(long movieId, String posterPath) {
+        this.movieId = movieId;
+        this.posterPath = this.posterDomainPath + posterPath;
+    }
+
+    public String getPosterPath() {
+        return this.posterPath;
+    }
 }
