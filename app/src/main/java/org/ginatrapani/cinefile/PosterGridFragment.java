@@ -120,7 +120,7 @@ public class PosterGridFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+                //Log.v(LOG_TAG, "Built URI " + builtUri.toString());
 
                 // Create the request to TheMovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -149,7 +149,7 @@ public class PosterGridFragment extends Fragment {
                     return null;
                 }
                 moviesJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
+                //Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
                 try {
                     return getMovieDataFromJson(moviesJsonStr);
                 } catch (JSONException e) {
@@ -196,7 +196,7 @@ public class PosterGridFragment extends Fragment {
             for(int i = 0; i < moviesArray.length(); i++) {
                 // Get the JSON object representing a movie
                 JSONObject singleMovie = moviesArray.getJSONObject(i);
-                Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
+                //Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
                 String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
                 long movieId = singleMovie.getLong(TMDB_MOVIE_ID);
                 String overview = singleMovie.getString(TMDB_OVERVIEW);
@@ -210,7 +210,7 @@ public class PosterGridFragment extends Fragment {
             if (result != null) {
                 mMoviesAdapter.clear();
                 for(Movie singleMovie : result) {
-                    Log.v(LOG_TAG, "Adding " + singleMovie + " to adapter");
+                    //Log.v(LOG_TAG, "Adding " + singleMovie + " to adapter");
                     mMoviesAdapter.add(singleMovie);
                 }
                 mMoviesAdapter.notifyDataSetChanged();
