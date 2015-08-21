@@ -21,9 +21,10 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        // The detail Activity called via intent.  Inspect the intent for forecast data.
+        // The detail Activity called via intent.  Inspect the intent for movie data.
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String detailStr = intent.getStringExtra(Intent.EXTRA_TEXT);
