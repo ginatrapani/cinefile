@@ -106,7 +106,6 @@ public class PosterGridFragment extends Fragment {
 
             // Will contain the raw JSON response as a string.
             String moviesJsonStr = null;
-            int numMovies = 10;
 
             try {
                 // Construct the URL for the TheMovieDB query
@@ -154,7 +153,7 @@ public class PosterGridFragment extends Fragment {
                 moviesJsonStr = buffer.toString();
                 Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
                 try {
-                    return getMovieDataFromJson(moviesJsonStr, numMovies);
+                    return getMovieDataFromJson(moviesJsonStr);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Error ", e);
                 }
@@ -185,7 +184,7 @@ public class PosterGridFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getMovieDataFromJson(String moviesJsonStr, int numMovies)
+        private String[] getMovieDataFromJson(String moviesJsonStr)
             throws JSONException {
             final String TMDB_RESULTS = "results";
             final String TMDB_POSTER_PATH = "poster_path";
@@ -193,8 +192,8 @@ public class PosterGridFragment extends Fragment {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-            String[] resultStrs = new String[numMovies];
-            for(int i = 0; i < numMovies; i++) {
+            String[] resultStrs = new String[moviesArray.length()];
+            for(int i = 0; i < moviesArray.length(); i++) {
                 // Get the JSON object representing a movie
                 JSONObject singleMovie = moviesArray.getJSONObject(i);
                 Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
@@ -212,6 +211,7 @@ public class PosterGridFragment extends Fragment {
                     Log.v(LOG_TAG, "Adding " + singleMovieStr + " to adapter");
                     mMoviesAdapter.add(singleMovieStr);
                 }
+                mMoviesAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -232,12 +232,6 @@ class ImageAdapter extends BaseAdapter {
 
     public ImageAdapter(Context c) {
         mContext = c;
-        // @TODO Remove this before submission
-        mThumbIds.add(domainPath + "/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
-        mThumbIds.add(domainPath + "/kqjL17yufvn9OVLyXYpvtyrFfak.jpg");
-        mThumbIds.add(domainPath + "/7SGGUiTE6oc2fh9MjIk5M00dsQd.jpg");
-        mThumbIds.add(domainPath + "/5JU9ytZJyR3zmClGmVm9q4Geqbd.jpg");
-        mThumbIds.add(domainPath + "/xxOKDTQbQo7h1h7TyrQIW7u8KcJ.jpg");
     }
 
     public int getCount() {
