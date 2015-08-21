@@ -61,6 +61,7 @@ public class PosterGridFragment extends Fragment {
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
         mMoviesAdapter = new ImageAdapter(this.getActivity());
         gridview.setAdapter(mMoviesAdapter);
+        new FetchMoviesTask().execute("popularity.desc");
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
