@@ -31,14 +31,6 @@ public class MovieDetailActivityFragment extends Fragment {
             Log.v(LOG_TAG, "Detail string is " + detailStr);
             ((TextView) rootView.findViewById(R.id.detail_text))
                     .setText(detailStr);
-        } else {
-            if (intent == null) {
-                Log.v(LOG_TAG, "Intent is null");
-            } else {
-                Log.v(LOG_TAG, "Intent has no extra");
-            }
-            ((TextView) rootView.findViewById(R.id.detail_text))
-                    .setText("HAI");
         }
 
         return rootView;
