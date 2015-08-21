@@ -1,6 +1,7 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -67,8 +67,10 @@ public class PosterGridFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
-                Toast.makeText( getActivity(), clickedMovie.getOverview(),
-                        Toast.LENGTH_LONG).show();
+
+                Intent viewMovieDetailsIntent = new Intent(getActivity(), MovieDetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, clickedMovie.getOverview());
+                startActivity(viewMovieDetailsIntent);
             }
         });
         return rootView;

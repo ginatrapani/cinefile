@@ -1,16 +1,26 @@
 package org.ginatrapani.cinefile;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class MovieDetailActivity extends AppCompatActivity {
+    public final static String EXTRA_MESSAGE = "org.ginatrapani.cinefile.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_detail);
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(MovieDetailActivity.EXTRA_MESSAGE);
+
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText(message);
+        // Set the text view as the activity layout
+        setContentView(textView);
     }
 
 
