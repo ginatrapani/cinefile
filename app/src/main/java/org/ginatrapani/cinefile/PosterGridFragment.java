@@ -66,8 +66,9 @@ public class PosterGridFragment extends Fragment {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText( getActivity(), "" + position,
-                        Toast.LENGTH_SHORT).show();
+                Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
+                Toast.makeText( getActivity(), clickedMovie.getOverview(),
+                        Toast.LENGTH_LONG).show();
             }
         });
         return rootView;
@@ -184,6 +185,7 @@ public class PosterGridFragment extends Fragment {
             final String TMDB_RESULTS = "results";
             final String TMDB_POSTER_PATH = "poster_path";
             final String TMDB_MOVIE_ID = "id";
+            final String TMDB_OVERVIEW = "overview";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
@@ -195,7 +197,8 @@ public class PosterGridFragment extends Fragment {
                 Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
                 String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
                 long movieId = singleMovie.getLong(TMDB_MOVIE_ID);
-                resultMovies[i] = new Movie(movieId, posterPath);
+                String overview = singleMovie.getString(TMDB_OVERVIEW);
+                resultMovies[i] = new Movie(movieId, posterPath, overview);
             }
             return resultMovies;
         }
@@ -234,11 +237,11 @@ class ImageAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return null;
+        return mThumbIds.get(position);
     }
 
     public long getItemId(int position) {
-        return 0;
+        return mThumbIds.get(position).getId();
     }
 
     // create a new ImageView for each item referenced by the Adapter
@@ -265,17 +268,28 @@ class Movie {
 
     private String posterPath;
 
+    private String overview;
+
     private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
 
     // @TODO Set the rest of the required attributes
 
 
-    public Movie(long movieId, String posterPath) {
+    public Movie(long movieId, String posterPath, String overview) {
         this.movieId = movieId;
         this.posterPath = this.posterDomainPath + posterPath;
+        this.overview = overview;
     }
 
     public String getPosterPath() {
         return this.posterPath;
+    }
+
+    public long getId() {
+        return this.movieId;
+    }
+
+    public String getOverview() {
+        return this.overview;
     }
 }
