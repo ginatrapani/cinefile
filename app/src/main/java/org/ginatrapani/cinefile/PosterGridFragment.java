@@ -39,14 +39,12 @@ public class PosterGridFragment extends Fragment {
 
 
     public PosterGridFragment() {
-        // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Add this line in order for this fragment to handle menu events.
+        // Handle menu events
         setHasOptionsMenu(true);
     }
 
@@ -81,12 +79,10 @@ public class PosterGridFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            //@TODO use the right sort based on settings
+            // @TODO use the right sort order based on user setting
             new FetchMoviesTask().execute("popularity.desc");
             return true;
         }
@@ -99,12 +95,10 @@ public class PosterGridFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... params) {
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
-            // Will contain the raw JSON response as a string.
+            // Raw JSON response as a string
             String moviesJsonStr = null;
 
             try {
@@ -133,7 +127,7 @@ public class PosterGridFragment extends Fragment {
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
-                    // Nothing to do.
+                    // Nothing to do
                     return null;
                 }
                 reader = new BufferedReader(new InputStreamReader(inputStream));
