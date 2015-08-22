@@ -65,8 +65,8 @@ public class PosterGridFragment extends Fragment {
         gridview.setAdapter(mMoviesAdapter);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_title_sync_frequency),
-                getString(R.string.pref_title_sync_frequency_default));
+        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                getString(R.string.pref_default_sort));
         new FetchMoviesTask().execute(sortOrder);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,8 +93,8 @@ public class PosterGridFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String sortOrder = prefs.getString(getString(R.string.pref_title_sync_frequency),
-                    getString(R.string.pref_title_sync_frequency_default));
+            String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                    getString(R.string.pref_default_sort));
 
             Log.v("SORT", "Sorted by " + sortOrder);
             new FetchMoviesTask().execute(sortOrder);
