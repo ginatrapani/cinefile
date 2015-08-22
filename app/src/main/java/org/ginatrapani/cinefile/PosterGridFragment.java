@@ -2,9 +2,11 @@ package org.ginatrapani.cinefile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,7 +63,11 @@ public class PosterGridFragment extends Fragment {
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
         mMoviesAdapter = new ImageAdapter(this.getActivity());
         gridview.setAdapter(mMoviesAdapter);
-        new FetchMoviesTask().execute("popularity.desc");
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_title_sync_frequency),
+                getString(R.string.pref_title_sync_frequency_default));
+        new FetchMoviesTask().execute(sortOrder);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -86,8 +92,12 @@ public class PosterGridFragment extends Fragment {
         // Handle action bar item clicks
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            // @TODO use the right sort order based on user setting
-            new FetchMoviesTask().execute("popularity.desc");
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortOrder = prefs.getString(getString(R.string.pref_title_sync_frequency),
+                    getString(R.string.pref_title_sync_frequency_default));
+
+            Log.v("SORT", "Sorted by " + sortOrder);
+            new FetchMoviesTask().execute(sortOrder);
             return true;
         }
         return super.onOptionsItemSelected(item);
