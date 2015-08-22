@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 
 public class MovieDetailActivityFragment extends Fragment {
 
@@ -31,10 +34,25 @@ public class MovieDetailActivityFragment extends Fragment {
                     .setText(movie.getOverview());
             ((TextView) rootView.findViewById(R.id.movie_title))
                     .setText(movie.getTitle());
+            SimpleDateFormat apiReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat friendlyReleaseDateFormat = new SimpleDateFormat("MMMM d, yyyy");
+
+            String reformattedReleaseDateStr = movie.getReleaseDate();
+            try {
+                reformattedReleaseDateStr = friendlyReleaseDateFormat
+                        .format(apiReleaseDate.parse(movie.getReleaseDate()));
+            } catch (ParseException e) {
+                //do nothing, default to what API returned
+            }
             ((TextView) rootView.findViewById(R.id.movie_release))
-                    .setText(movie.getReleaseDate());
+                    .setText(getResources().getString(R.string.release_date_label)
+                    + " " + reformattedReleaseDateStr);
+
+            String voteAverageString = getResources().getString(R.string.vote_average_prefix)
+                    + " " + movie.getVoteAverage()
+                    + " " + getResources().getString(R.string.vote_average_suffix);
             ((TextView) rootView.findViewById(R.id.vote_average))
-                    .setText(movie.getVoteAverage());
+                    .setText(voteAverageString);
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
             Picasso.with(getActivity()).load(movie.getPosterPath()).
                     resize(movie.getDefaultWidth() * 3, movie.getDefaultHeight() * 3)
