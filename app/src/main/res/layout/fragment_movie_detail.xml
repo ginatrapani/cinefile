@@ -1,13 +1,74 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="org.ginatrapani.cinefile.MovieDetailActivityFragment">
+    android:layout_height="match_parent"
+    tools:context="org.ginatrapani.cinefile.MovieDetailActivityFragment"
+    android:rowCount="3"
+    android:columnCount="2"
+    android:orientation="vertical">
 
-    <TextView android:layout_width="wrap_content"
-        android:id="@+id/detail_text"
-        android:layout_height="wrap_content" />
+    <TextView android:layout_width="match_parent"
+        android:id="@+id/movie_title"
+        android:layout_height="wrap_content"
+        android:text="Mad Max: Fury Road"
+        android:layout_column="0"
+        android:layout_row="0"
+        android:textSize="20sp"
+        android:layout_gravity="top"
+        android:gravity="top"
+        android:layout_columnSpan="2"
+        android:layout_rowSpan="1"
+        android:layout_marginLeft="20dip"
+        android:layout_marginTop="20dip" />
 
-</RelativeLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_gravity="top"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dip"
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="5dip">
+
+        <TextView android:layout_width="wrap_content"
+            android:id="@+id/movie_release"
+            android:layout_height="wrap_content"
+            android:text="August 22, 2015"
+            android:textSize="12sp" />
+
+        <TextView android:layout_width="wrap_content"
+            android:id="@+id/vote_average"
+            android:layout_height="wrap_content"
+            android:text="16 votes"
+            android:textSize="12sp"
+            android:layout_toEndOf="@id/movie_release"
+            android:layout_toRightOf="@id/movie_release"
+            android:layout_marginLeft="10dip" />
+    </RelativeLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:columnCount="2"
+        android:rowCount="1"
+        android:layout_margin="20dip">
+
+        <ImageView android:layout_width="wrap_content"
+            android:id="@+id/movie_poster"
+            android:layout_height="wrap_content"
+            android:src="@drawable/poster"
+            android:layout_column="1"
+            android:layout_marginRight="25dip" />
+
+        <TextView android:layout_width="wrap_content"
+            android:id="@+id/detail_text"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/movie_poster"
+            android:layout_toRightOf="@id/movie_poster"
+            android:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland."
+            android:layout_column="0" />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>
