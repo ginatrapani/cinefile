@@ -18,6 +18,7 @@ import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,6 +34,21 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
+
+    private static List<String> fragments = new ArrayList<String>();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.pref_headers, target);
+        fragments.clear();
+        for (Header header : target) {
+            fragments.add(header.fragment);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +66,11 @@ public class SettingsActivity extends PreferenceActivity {
             //@TODO Figure out why this causes the app to crash
             //getActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName)  {
+        return fragments.contains(fragmentName);
     }
 
     @Override
@@ -71,7 +92,6 @@ public class SettingsActivity extends PreferenceActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -88,17 +108,7 @@ public class SettingsActivity extends PreferenceActivity {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }
-
+    
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
