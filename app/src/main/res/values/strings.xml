@@ -1,20 +1,11 @@
 <resources>
     <string name="app_name">Cinefile</string>
-
-    <!-- @TODO remove this for debugging -->
-    <string name="action_refresh" translatable="false">Refresh</string>
-
     <string name="action_settings">Settings</string>
     <string name="title_activity_movie_detail">Movie Details</string>
 
     <!-- Strings related to Settings -->
     <string name="title_activity_settings">Settings</string>
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
     <string name="pref_key_sort" translatable="false">sort</string>
-
     <string name="pref_title_sort">Sort by</string>
     <string name="pref_default_sort">vote_average.desc</string>
 </resources>

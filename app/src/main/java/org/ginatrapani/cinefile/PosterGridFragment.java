@@ -40,7 +40,6 @@ public class PosterGridFragment extends Fragment {
 
     public static ImageAdapter mMoviesAdapter;
 
-
     public PosterGridFragment() {
     }
 
@@ -100,10 +99,6 @@ public class PosterGridFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            updateMovies();
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -242,13 +237,15 @@ public class PosterGridFragment extends Fragment {
 
 class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    // references to our movies
+    private ArrayList<Movie> mMovies = new ArrayList();
 
     public void clear() {
-        mThumbIds.clear();
+        mMovies.clear();
     }
 
     public void add(Movie movie) {
-        mThumbIds.add(movie);
+        mMovies.add(movie);
     }
 
     public ImageAdapter(Context c) {
@@ -256,15 +253,15 @@ class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mThumbIds.size();
+        return mMovies.size();
     }
 
     public Object getItem(int position) {
-        return mThumbIds.get(position);
+        return mMovies.get(position);
     }
 
     public long getItemId(int position) {
-        return mThumbIds.get(position).getId();
+        return mMovies.get(position).getId();
     }
 
     // create a new ImageView for each item referenced by the Adapter
@@ -276,15 +273,12 @@ class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-        Movie movie = mThumbIds.get(position);
+        Movie movie = mMovies.get(position);
         Picasso.with(mContext).load(movie.getPosterPath())
                 .resize(movie.getDefaultWidth() * 2, movie.getDefaultHeight() * 2)
-                .centerCrop().into(imageView);
+                .into(imageView);
         return imageView;
     }
-
-    // references to our images
-    private ArrayList<Movie> mThumbIds = new ArrayList();
 }
 
 class Movie implements Parcelable {
@@ -300,11 +294,10 @@ class Movie implements Parcelable {
     private String releaseDate;
 
     private String voteAverage;
-    
+
     private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
     public final int defaultWidth = 185;
     public final int defaultHeight = 278;
-
 
     /**
      * This field is needed for Android to be able to

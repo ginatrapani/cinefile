@@ -9,7 +9,6 @@
     <TextView android:layout_width="match_parent"
         android:id="@+id/movie_title"
         android:layout_height="wrap_content"
-        android:text="Mad Max: Fury Road"
         android:layout_column="0"
         android:layout_row="0"
         android:textSize="20sp"
@@ -31,13 +30,11 @@
         <TextView android:layout_width="wrap_content"
             android:id="@+id/movie_release"
             android:layout_height="wrap_content"
-            android:text="August 22, 2015"
             android:textSize="12sp" />
 
         <TextView android:layout_width="wrap_content"
             android:id="@+id/vote_average"
             android:layout_height="wrap_content"
-            android:text="16 votes"
             android:textSize="12sp"
             android:layout_toEndOf="@id/movie_release"
             android:layout_toRightOf="@id/movie_release"
@@ -55,7 +52,6 @@
         <ImageView android:layout_width="wrap_content"
             android:id="@+id/movie_poster"
             android:layout_height="wrap_content"
-            android:src="@drawable/poster"
             android:layout_column="1"
             android:layout_marginRight="25dip" />
 
@@ -64,10 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/movie_poster"
             android:layout_toRightOf="@id/movie_poster"
-            android:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland."
             android:layout_column="0" />
-
-
 
     </RelativeLayout>
 

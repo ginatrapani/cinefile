@@ -3,20 +3,16 @@ package org.ginatrapani.cinefile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.squareup.picasso.Picasso;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MovieDetailActivityFragment extends Fragment {
-    private static final String LOG_TAG = "TAG";
+
+    //private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
 
     public MovieDetailActivityFragment() {
     }
@@ -24,14 +20,13 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
         // The detail Activity called via intent.  Inspect the intent for movie data.
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra("movie")) {
             Movie movie = intent.getParcelableExtra("movie");
-            Log.v(LOG_TAG, "Overview string is " + movie.getOverview());
+            //Log.v(TAG, "Overview string is " + movie.getOverview());
             ((TextView) rootView.findViewById(R.id.detail_text))
                     .setText(movie.getOverview());
             ((TextView) rootView.findViewById(R.id.movie_title))
@@ -42,11 +37,10 @@ public class MovieDetailActivityFragment extends Fragment {
                     .setText(movie.getVoteAverage());
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
             Picasso.with(getActivity()).load(movie.getPosterPath()).
-                    resize(movie.getDefaultWidth()*3, movie.getDefaultHeight()*3)
+                    resize(movie.getDefaultWidth() * 3, movie.getDefaultHeight() * 3)
                     .into(imageView);
 
         }
-
         return rootView;
     }
 }
