@@ -7,7 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,11 +29,22 @@ public class MovieDetailActivityFragment extends Fragment {
 
         // The detail Activity called via intent.  Inspect the intent for movie data.
         Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            String detailStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-            Log.v(LOG_TAG, "Detail string is " + detailStr);
+        if (intent != null && intent.hasExtra("movie")) {
+            Movie movie = intent.getParcelableExtra("movie");
+            Log.v(LOG_TAG, "Overview string is " + movie.getOverview());
             ((TextView) rootView.findViewById(R.id.detail_text))
-                    .setText(detailStr);
+                    .setText(movie.getOverview());
+            ((TextView) rootView.findViewById(R.id.movie_title))
+                    .setText(movie.getTitle());
+            ((TextView) rootView.findViewById(R.id.movie_release))
+                    .setText(movie.getReleaseDate());
+            ((TextView) rootView.findViewById(R.id.vote_average))
+                    .setText(movie.getVoteAverage());
+            ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
+            Picasso.with(getActivity()).load(movie.getPosterPath()).
+                    resize(movie.getDefaultWidth()*3, movie.getDefaultHeight()*3)
+                    .into(imageView);
+
         }
 
         return rootView;

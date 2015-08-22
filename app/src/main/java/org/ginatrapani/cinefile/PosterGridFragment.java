@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,7 +35,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
 
 public class PosterGridFragment extends Fragment {
 
@@ -70,7 +71,7 @@ public class PosterGridFragment extends Fragment {
                 Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
 
                 Intent viewMovieDetailsIntent = new Intent(getActivity(), MovieDetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, clickedMovie.getOverview());
+                        .putExtra("movie", clickedMovie);
                 startActivity(viewMovieDetailsIntent);
             }
         });
@@ -201,6 +202,9 @@ public class PosterGridFragment extends Fragment {
             final String TMDB_POSTER_PATH = "poster_path";
             final String TMDB_MOVIE_ID = "id";
             final String TMDB_OVERVIEW = "overview";
+            final String TMDB_TITLE = "original_title";
+            final String TMDB_RELEASE = "release_date";
+            final String TMDB_VOTE_AVG = "vote_average";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
@@ -213,7 +217,11 @@ public class PosterGridFragment extends Fragment {
                 String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
                 long movieId = singleMovie.getLong(TMDB_MOVIE_ID);
                 String overview = singleMovie.getString(TMDB_OVERVIEW);
-                resultMovies[i] = new Movie(movieId, posterPath, overview);
+                String title = singleMovie.getString(TMDB_TITLE);
+                String releaseDate = singleMovie.getString(TMDB_RELEASE);
+                String voteAverage = singleMovie.getString(TMDB_VOTE_AVG);
+                resultMovies[i] = new Movie(movieId, posterPath, overview, title, releaseDate,
+                        voteAverage);
             }
             return resultMovies;
         }
@@ -268,8 +276,10 @@ class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-
-        Picasso.with(mContext).load(mThumbIds.get(position).getPosterPath()).into(imageView);
+        Movie movie = mThumbIds.get(position);
+        Picasso.with(mContext).load(movie.getPosterPath())
+                .resize(movie.getDefaultWidth() * 2, movie.getDefaultHeight() * 2)
+                .centerCrop().into(imageView);
         return imageView;
     }
 
@@ -277,7 +287,7 @@ class ImageAdapter extends BaseAdapter {
     private ArrayList<Movie> mThumbIds = new ArrayList();
 }
 
-class Movie {
+class Movie implements Parcelable {
 
     private long movieId;
 
@@ -285,15 +295,51 @@ class Movie {
 
     private String overview;
 
+    private String title;
+
+    private String releaseDate;
+
+    private String voteAverage;
+    
     private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
+    public final int defaultWidth = 185;
+    public final int defaultHeight = 278;
 
-    // @TODO Set the rest of the required attributes
+
+    /**
+     * This field is needed for Android to be able to
+     * create new objects, individually or as arrays.
+     */
+    public static final Parcelable.Creator CREATOR =
+        new Parcelable.Creator() {
+            public Movie createFromParcel(Parcel in) {
+                return new Movie(in);
+            }
+
+            public Movie[] newArray(int size) {
+                return new Movie[size];
+            }
+        };
 
 
-    public Movie(long movieId, String posterPath, String overview) {
+    public Movie(long movieId, String posterPath, String overview, String title, String releaseDate,
+                 String voteAverage) {
         this.movieId = movieId;
         this.posterPath = this.posterDomainPath + posterPath;
         this.overview = overview;
+        this.title = title;
+        this.releaseDate = releaseDate;
+        this.voteAverage = voteAverage;
+    }
+
+    /**
+     * Constructor to use when re-constructing object
+     * from a parcel
+     *
+     * @param in a parcel from which to read this object
+     */
+    public Movie(Parcel in) {
+        readFromParcel(in);
     }
 
     public String getPosterPath() {
@@ -306,5 +352,58 @@ class Movie {
 
     public String getOverview() {
         return this.overview;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public String getVoteAverage() {
+        return voteAverage;
+    }
+
+    public int getDefaultWidth() {
+        return defaultWidth;
+    }
+
+    public int getDefaultHeight() {
+        return defaultHeight;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        // Write each field into the parcel.
+        // When reading from parcel, they will come back in the same order.
+        dest.writeLong(movieId);
+        dest.writeString(posterPath);
+        dest.writeString(overview);
+        dest.writeString(title);
+        dest.writeString(releaseDate);
+        dest.writeString(voteAverage);
+    }
+
+    /**
+     * Called from the constructor to create this
+     * object from a parcel.
+     *
+     * @param in parcel from which to re-create object
+     */
+    private void readFromParcel(Parcel in) {
+        // Read back each field in the order that it was written to the parcel
+        movieId = in.readLong();
+        posterPath = in.readString();
+        overview = in.readString();
+        title = in.readString();
+        releaseDate = in.readString();
+        voteAverage = in.readString();
     }
 }
