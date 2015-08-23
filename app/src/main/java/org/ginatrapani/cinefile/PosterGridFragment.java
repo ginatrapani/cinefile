@@ -135,13 +135,13 @@ public class PosterGridFragment extends Fragment {
 
             try {
                 // Construct the URL for the TheMovieDB query
-                final String FORECAST_BASE_URL =
+                final String MOVIE_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";
                 final String SORT_BY_PARAM = "sort_by";
                 final String API_KEY_PARAM = "api_key";
                 String api_key = getString(R.string.api_key);
 
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
                         .appendQueryParameter(SORT_BY_PARAM, params[0])
                         .appendQueryParameter(API_KEY_PARAM, api_key)
                         .build();
