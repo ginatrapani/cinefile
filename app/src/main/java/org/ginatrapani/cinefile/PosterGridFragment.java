@@ -40,6 +40,10 @@ public class PosterGridFragment extends Fragment {
 
     public static ImageAdapter mMoviesAdapter;
 
+    private static final String KEY_MOVIE_LIST = "movies";
+
+    private ArrayList<Movie> mMovies;
+
     public PosterGridFragment() {
     }
 
@@ -58,6 +62,11 @@ public class PosterGridFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            // read the movie list from the saved state
+            mMovies = savedInstanceState.getParcelableArrayList(KEY_MOVIE_LIST);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_poster_grid, container, false);
 
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
@@ -78,10 +87,14 @@ public class PosterGridFragment extends Fragment {
     }
 
     private void updateMovies() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-                getString(R.string.pref_default_sort));
-        new FetchMoviesTask().execute(sortOrder);
+        if (mMovies != null) {
+            mMoviesAdapter.setMovies(mMovies);
+        } else {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                    getString(R.string.pref_default_sort));
+            new FetchMoviesTask().execute(sortOrder);
+        }
     }
 
     @Override
@@ -100,6 +113,12 @@ public class PosterGridFragment extends Fragment {
         // Handle action bar item clicks
         int id = item.getItemId();
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(KEY_MOVIE_LIST, mMoviesAdapter.getMovies());
+        super.onSaveInstanceState(outState);
     }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
@@ -262,6 +281,14 @@ class ImageAdapter extends BaseAdapter {
 
     public long getItemId(int position) {
         return mMovies.get(position).getId();
+    }
+
+    public ArrayList<Movie> getMovies() {
+        return mMovies;
+    }
+
+    public void setMovies(ArrayList<Movie> mMovies) {
+        this.mMovies = mMovies;
     }
 
     // create a new ImageView for each item referenced by the Adapter
