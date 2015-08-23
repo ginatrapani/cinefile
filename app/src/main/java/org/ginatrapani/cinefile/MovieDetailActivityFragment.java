@@ -55,7 +55,7 @@ public class MovieDetailActivityFragment extends Fragment {
                     .setText(voteAverageString);
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
             Picasso.with(getActivity()).load(movie.getPosterPath()).
-                    resize(movie.getDefaultWidth() * 3, movie.getDefaultHeight() * 3)
+                    resize(movie.getDefaultWidth() * 2, movie.getDefaultHeight() * 2)
                     .into(imageView);
 
         }
