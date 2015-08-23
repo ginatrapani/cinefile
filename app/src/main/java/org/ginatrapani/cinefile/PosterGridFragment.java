@@ -312,15 +312,27 @@ class Movie implements Parcelable {
 
     private long movieId;
 
+    private static final String KEY_MOVIE_ID = "movie_id";
+
     private String posterPath;
+
+    private static final String KEY_POSTER_PATH = "poster_path";
 
     private String overview;
 
+    private static final String KEY_OVERVIEW = "overview";
+
     private String title;
+
+    private static final String KEY_TITLE = "title";
 
     private String releaseDate;
 
+    private static final String KEY_RELEASE_DATE = "release_date";
+
     private String voteAverage;
+
+    private static final String KEY_VOTE_AVERAGE = "vote_average";
 
     private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
     public final int defaultWidth = 185;
@@ -332,8 +344,15 @@ class Movie implements Parcelable {
      */
     public static final Parcelable.Creator CREATOR =
         new Parcelable.Creator() {
-            public Movie createFromParcel(Parcel in) {
-                return new Movie(in);
+            public Movie createFromParcel(Parcel source) {
+                // read the bundle containing key value pairs from the parcel
+                Bundle bundle = source.readBundle();
+
+                // instantiate a person using values from the bundle
+                return new Movie( bundle.getLong(KEY_MOVIE_ID), bundle.getString(KEY_POSTER_PATH),
+                        bundle.getString(KEY_OVERVIEW), bundle.getString(KEY_TITLE),
+                        bundle.getString(KEY_RELEASE_DATE),
+                        bundle.getString(KEY_VOTE_AVERAGE));
             }
 
             public Movie[] newArray(int size) {
@@ -350,16 +369,6 @@ class Movie implements Parcelable {
         this.title = title;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
-    }
-
-    /**
-     * Constructor to use when re-constructing object
-     * from a parcel
-     *
-     * @param in a parcel from which to read this object
-     */
-    public Movie(Parcel in) {
-        readFromParcel(in);
     }
 
     public String getPosterPath() {
@@ -401,29 +410,18 @@ class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        // Write each field into the parcel.
-        // When reading from parcel, they will come back in the same order.
-        dest.writeLong(movieId);
-        dest.writeString(posterPath);
-        dest.writeString(overview);
-        dest.writeString(title);
-        dest.writeString(releaseDate);
-        dest.writeString(voteAverage);
-    }
 
-    /**
-     * Called from the constructor to create this
-     * object from a parcel.
-     *
-     * @param in parcel from which to re-create object
-     */
-    private void readFromParcel(Parcel in) {
-        // Read back each field in the order that it was written to the parcel
-        movieId = in.readLong();
-        posterPath = in.readString();
-        overview = in.readString();
-        title = in.readString();
-        releaseDate = in.readString();
-        voteAverage = in.readString();
+        // create a bundle for the key value pairs
+        Bundle bundle = new Bundle();
+
+        // insert the key value pairs to the bundle
+        bundle.putLong(KEY_MOVIE_ID, movieId);
+        bundle.putString(KEY_POSTER_PATH, posterPath);
+        bundle.putString(KEY_OVERVIEW, overview);
+        bundle.putString(KEY_TITLE, title);
+        bundle.putString(KEY_RELEASE_DATE, releaseDate);
+        bundle.putString(KEY_VOTE_AVERAGE, voteAverage);
+        // write the key value pairs to the parcel
+        dest.writeBundle(bundle);
     }
 }
