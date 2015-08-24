@@ -38,6 +38,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
+        } else {
+            onBackPressed();
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
