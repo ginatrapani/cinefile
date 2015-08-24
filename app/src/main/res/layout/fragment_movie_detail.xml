@@ -1,67 +1,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="org.ginatrapani.cinefile.MovieDetailActivityFragment"
-    android:rowCount="3"
-    android:columnCount="2"
     android:orientation="vertical">
 
-    <TextView android:layout_width="match_parent"
-        android:id="@+id/movie_title"
-        android:layout_height="wrap_content"
-        android:layout_column="0"
-        android:layout_row="0"
-        android:textSize="20sp"
-        android:layout_gravity="top"
-        android:gravity="top"
-        android:layout_columnSpan="2"
-        android:layout_rowSpan="1"
-        android:layout_marginLeft="20dip"
-        android:layout_marginTop="20dip" />
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_gravity="top"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginLeft="20dip"
-        android:layout_marginTop="5dip"
-        android:layout_marginBottom="5dip">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView android:layout_width="wrap_content"
-            android:id="@+id/movie_release"
+        <TextView android:layout_width="match_parent"
+            android:id="@+id/movie_title"
             android:layout_height="wrap_content"
-            android:textSize="12sp" />
+            android:textSize="20sp"
+            android:gravity="center_vertical"
+            android:layout_margin="10dip" />
 
-        <TextView android:layout_width="wrap_content"
-            android:id="@+id/vote_average"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:layout_toEndOf="@id/movie_release"
-            android:layout_toRightOf="@id/movie_release"
-            android:layout_marginLeft="10dip" />
-    </RelativeLayout>
+            android:orientation="horizontal">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:columnCount="2"
-        android:rowCount="1"
-        android:layout_margin="20dip">
+            <ImageView android:layout_width="wrap_content"
+                android:id="@+id/movie_poster"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip" />
 
-        <ImageView android:layout_width="wrap_content"
-            android:id="@+id/movie_poster"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_marginRight="25dip" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="10dip">
+                <TextView android:layout_width="wrap_content"
+                    android:id="@+id/movie_release"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp" />
+
+                <TextView android:layout_width="wrap_content"
+                    android:id="@+id/vote_average"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <TextView android:layout_width="wrap_content"
             android:id="@+id/detail_text"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/movie_poster"
-            android:layout_toRightOf="@id/movie_poster"
-            android:layout_column="0" />
+            android:layout_margin="10dip" />
 
-    </RelativeLayout>
-
+    </LinearLayout>
 </LinearLayout>

@@ -45,19 +45,15 @@ public class MovieDetailActivityFragment extends Fragment {
                 //do nothing, default to what API returned
             }
             ((TextView) rootView.findViewById(R.id.movie_release))
-                    .setText(getResources().getString(R.string.release_date_label)
-                    + " " + reformattedReleaseDateStr);
+                    .setText(reformattedReleaseDateStr);
 
-            String voteAverageString = getResources().getString(R.string.vote_average_prefix)
-                    + " " + movie.getVoteAverage()
+            String voteAverageString = movie.getVoteAverage()
                     + " " + getResources().getString(R.string.vote_average_suffix);
             ((TextView) rootView.findViewById(R.id.vote_average))
                     .setText(voteAverageString);
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(getActivity()).load(movie.getPosterPath()).
-                    resize(movie.getDefaultWidth() * 2, movie.getDefaultHeight() * 2)
+            Picasso.with(getActivity()).load(movie.getPosterPath())
                     .into(imageView);
-
         }
         return rootView;
     }
