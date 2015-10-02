@@ -50,5 +50,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dip" />
 
+        <ListView
+            android:id="@+id/listview_trailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip" />
+
     </LinearLayout>
+
 </LinearLayout>
