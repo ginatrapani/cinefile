@@ -1,5 +1,6 @@
 package org.ginatrapani.cinefile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -9,7 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,7 +37,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
 
-    private ArrayAdapter<String> mTrailerAdapter;
+    private TrailerAdapter mTrailerAdapter;
 
     private ArrayList<Trailer> mTrailers;
 
@@ -45,12 +47,7 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mTrailerAdapter =
-                new ArrayAdapter<String>
-                        (this.getActivity(), // The current context (this activity)
-                        R.layout.list_item_trailer, // The name of the layout ID.
-                        R.id.list_item_trailer_textview, // The ID of the textview to populate.
-                        new ArrayList<String>());
+        mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
@@ -88,16 +85,17 @@ public class MovieDetailActivityFragment extends Fragment {
             Picasso.with(getActivity()).load(movie.getPosterPath())
                     .into(imageView);
 
-//            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//                @Override
-//                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                    String forecast = mForecastAdapter.getItem(position);
-//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                            .putExtra(Intent.EXTRA_TEXT, forecast);
-//                    startActivity(intent);
-//                }
-//            });
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    Trailer trailer = mTrailerAdapter.getItem(position);
+                    Uri builtUri = Uri.parse("http://youtube.com//watch?v="+trailer.getKey()).
+                            buildUpon().build();
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(builtUri);
+                    startActivity(intent);
+                }
+            });
 
         }
         return rootView;
@@ -237,7 +235,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 mTrailerAdapter.clear();
                 for(Trailer singleTrailer : result) {
                     Log.v(LOG_TAG, "Adding " + singleTrailer.getName() + " to adapter");
-                    mTrailerAdapter.add(singleTrailer.getName());
+                    mTrailerAdapter.add(singleTrailer);
                 }
                 mTrailerAdapter.notifyDataSetChanged();
             }
@@ -245,6 +243,56 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 }
 
+class TrailerAdapter extends BaseAdapter {
+    // references to our trailers
+    private ArrayList<Trailer> mTrailers = new ArrayList();
+
+    private LayoutInflater inflater = null;
+
+    public void clear() {
+        mTrailers.clear();
+    }
+
+    public void add(Trailer trailer) {
+        mTrailers.add(trailer);
+    }
+
+    public TrailerAdapter(Context c) {
+        inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public int getCount() {
+        return mTrailers.size();
+    }
+
+    public Trailer getItem(int position) {
+        return mTrailers.get(position);
+    }
+
+    public long getItemId(int position) {
+        return position;
+    }
+
+//    public ArrayList<Trailer> getTrailers() {
+//        return mTrailers;
+//    }
+//
+//    public void setTrailers(ArrayList<Trailer> mTrailers) {
+//        this.mTrailers = mTrailers;
+//    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View vi = convertView;
+        if(convertView == null)
+            vi = inflater.inflate(R.layout.list_item_trailer, null);
+
+        TextView name = (TextView)vi.findViewById(R.id.list_item_trailer_textview);
+
+        name.setText(this.getItem(position).getName());
+
+        return vi;
+    }
+}
 
 class Trailer {
 
