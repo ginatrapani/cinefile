@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -44,5 +46,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onClickFavorite(View v) {
+        Toast.makeText(this, "Storing favorite in SharedPreference",
+                Toast.LENGTH_LONG).show();
+
     }
 }

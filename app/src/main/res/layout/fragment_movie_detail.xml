@@ -41,6 +41,13 @@
                     android:id="@+id/vote_average"
                     android:layout_height="wrap_content"
                     android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/button_favorite"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:onClick="onClickFavorite"
+                    android:text="@string/button_favorite_label" />
             </LinearLayout>
 
         </LinearLayout>
