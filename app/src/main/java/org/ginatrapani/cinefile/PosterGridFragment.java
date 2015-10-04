@@ -179,7 +179,7 @@ public class PosterGridFragment extends Fragment {
                 moviesJsonStr = buffer.toString();
                 //Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
                 try {
-                    return getMovieDataFromJson(moviesJsonStr);
+                    return getMoviesFromJsonStr(moviesJsonStr);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Error ", e);
                 }
@@ -210,15 +210,9 @@ public class PosterGridFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private Movie[] getMovieDataFromJson(String moviesJsonStr)
+        private Movie[] getMoviesFromJsonStr(String moviesJsonStr)
             throws JSONException {
             final String TMDB_RESULTS = "results";
-            final String TMDB_POSTER_PATH = "poster_path";
-            final String TMDB_MOVIE_ID = "id";
-            final String TMDB_OVERVIEW = "overview";
-            final String TMDB_TITLE = "original_title";
-            final String TMDB_RELEASE = "release_date";
-            final String TMDB_VOTE_AVG = "vote_average";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
@@ -227,17 +221,29 @@ public class PosterGridFragment extends Fragment {
             for(int i = 0; i < moviesArray.length(); i++) {
                 // Get the JSON object representing a movie
                 JSONObject singleMovie = moviesArray.getJSONObject(i);
-                //Log.v(LOG_TAG, "Single Movie JSON Object " + singleMovie.toString());
-                String posterPath = singleMovie.getString(TMDB_POSTER_PATH);
-                long movieId = singleMovie.getLong(TMDB_MOVIE_ID);
-                String overview = singleMovie.getString(TMDB_OVERVIEW);
-                String title = singleMovie.getString(TMDB_TITLE);
-                String releaseDate = singleMovie.getString(TMDB_RELEASE);
-                String voteAverage = singleMovie.getString(TMDB_VOTE_AVG);
-                resultMovies[i] = new Movie(movieId, posterPath, overview, title, releaseDate,
-                        voteAverage);
+                resultMovies[i] = getMovieFromJSONObject(singleMovie);
             }
             return resultMovies;
+        }
+
+        private Movie getMovieFromJSONObject(JSONObject movieJsonObj) throws JSONException {
+            final String TMDB_POSTER_PATH = "poster_path";
+            final String TMDB_MOVIE_ID = "id";
+            final String TMDB_OVERVIEW = "overview";
+            final String TMDB_TITLE = "original_title";
+            final String TMDB_RELEASE = "release_date";
+            final String TMDB_VOTE_AVG = "vote_average";
+
+            Log.v(LOG_TAG, "Single Movie JSON Object " + movieJsonObj.toString());
+            String posterPath = movieJsonObj.getString(TMDB_POSTER_PATH);
+            long movieId = movieJsonObj.getLong(TMDB_MOVIE_ID);
+            String overview = movieJsonObj.getString(TMDB_OVERVIEW);
+            String title = movieJsonObj.getString(TMDB_TITLE);
+            String releaseDate = movieJsonObj.getString(TMDB_RELEASE);
+            String voteAverage = movieJsonObj.getString(TMDB_VOTE_AVG);
+
+            return new Movie(movieId, posterPath, overview, title, releaseDate,
+                    voteAverage);
         }
 
         @Override
