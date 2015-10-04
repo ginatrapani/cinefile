@@ -127,6 +127,17 @@ public class PosterGridFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
+            String sortOrder = params[0];
+            if (sortOrder.equals("favorites")) {
+                Movie[] moviesToShow = new Movie[1];
+                moviesToShow[0] = getMovieFromAPI(135397);
+                return moviesToShow;
+            } else {
+                return getMoviesFromAPI(sortOrder);
+            }
+        }
+
+        private Movie[] getMoviesFromAPI(String sortOrder) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -142,7 +153,7 @@ public class PosterGridFragment extends Fragment {
                 String api_key = getString(R.string.api_key);
 
                 Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_BY_PARAM, params[0])
+                        .appendQueryParameter(SORT_BY_PARAM, sortOrder)
                         .appendQueryParameter(API_KEY_PARAM, api_key)
                         .build();
 
@@ -180,6 +191,82 @@ public class PosterGridFragment extends Fragment {
                 //Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
                 try {
                     return getMoviesFromJsonStr(moviesJsonStr);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error ", e);
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                // If the code didn't successfully get the movie data, there's no point in attempting
+                // to parse it.
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private Movie getMovieFromAPI(long movieId) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Raw JSON response as a string
+            String moviesJsonStr = null;
+
+            try {
+                // Construct the URL for the TheMovieDB query
+                final String MOVIE_BASE_URL =
+                        "http://api.themoviedb.org/3/movie/" + new Long(movieId).toString() + "?";
+                final String API_KEY_PARAM = "api_key";
+                String api_key = getString(R.string.api_key);
+
+                Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
+                        .appendQueryParameter(API_KEY_PARAM, api_key)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                //Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+
+                // Create the request to TheMovieDB, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                moviesJsonStr = buffer.toString();
+                //Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
+                try {
+                    JSONObject moviesJson = new JSONObject(moviesJsonStr);
+                    return getMovieFromJSONObject(moviesJson);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Error ", e);
                 }
