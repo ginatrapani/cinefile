@@ -39,7 +39,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private TrailerAdapter mTrailerAdapter;
 
-    private ArrayList<Trailer> mTrailers;
+    private ReviewAdapter mReviewAdapter;
 
     public MovieDetailActivityFragment() {
     }
@@ -54,6 +54,12 @@ public class MovieDetailActivityFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_trailer);
         listView.setAdapter(mTrailerAdapter);
+
+        mReviewAdapter = new ReviewAdapter(this.getActivity());
+
+        // Get a reference to the ListView, and attach this adapter to it.
+        ListView reviewListView = (ListView) rootView.findViewById(R.id.listview_review);
+        reviewListView.setAdapter(mReviewAdapter);
 
         // The detail Activity called via intent.  Inspect the intent for movie data.
         Intent intent = getActivity().getIntent();
@@ -108,11 +114,16 @@ public class MovieDetailActivityFragment extends Fragment {
         if (intent != null && intent.hasExtra("movie")) {
             Movie movie = intent.getParcelableExtra("movie");
             updateTrailers(movie.getId());
+            updateReviews(movie.getId());
         }
     }
 
     private void updateTrailers(long movieId) {
         new FetchTrailersTask().execute(new Long(movieId).toString());
+    }
+
+    private void updateReviews(long movieId) {
+        new FetchReviewsTask().execute(new Long(movieId).toString());
     }
 
     public class FetchTrailersTask extends AsyncTask<String, Void, Trailer[]> {
@@ -241,6 +252,120 @@ public class MovieDetailActivityFragment extends Fragment {
             }
         }
     }
+
+    public class FetchReviewsTask extends AsyncTask<String, Void, Review[]> {
+
+        private final String LOG_TAG = FetchReviewsTask.class.getSimpleName();
+
+        @Override
+        protected Review[] doInBackground(String... params) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Raw JSON response as a string
+            String reviewsJsonStr = null;
+
+            try {
+                // Construct the URL for the TheMovieDB query
+                final String MOVIE_BASE_URL =
+                        "http://api.themoviedb.org/3/movie/" + params[0] + "/reviews?";
+                final String API_KEY_PARAM = "api_key";
+                String api_key = getString(R.string.api_key);
+
+                Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
+                        .appendQueryParameter(API_KEY_PARAM, api_key)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+
+                // Create the request to TheMovieDB, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                reviewsJsonStr = buffer.toString();
+                Log.v(LOG_TAG, "Trailers JSON " + reviewsJsonStr);
+                try {
+                    return getReviewDataFromJson(reviewsJsonStr);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error ", e);
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                // If the code didn't successfully get the movie data, there's no point in attempting
+                // to parse it.
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private Review[] getReviewDataFromJson(String reviewsJsonStr)
+                throws JSONException {
+            final String TMDB_RESULTS = "results";
+            final String TMDB_REVIEW_CONTENT = "content";
+            final String TMDB_REVIEW_AUTHOR = "author";
+
+            JSONObject reviewsJson = new JSONObject(reviewsJsonStr);
+            JSONArray reviewsArray = reviewsJson.getJSONArray(TMDB_RESULTS);
+
+            Review[] resultReviews = new Review[reviewsArray.length()];
+            for(int i = 0; i < reviewsArray.length(); i++) {
+                // Get the JSON object representing a review
+                JSONObject singleReview = reviewsArray.getJSONObject(i);
+                Log.v(LOG_TAG, "Single Review JSON Object " + singleReview.toString());
+                String reviewContent = singleReview.getString(TMDB_REVIEW_CONTENT);
+                String reviewAuthor = singleReview.getString(TMDB_REVIEW_AUTHOR);
+                resultReviews[i] = new Review(reviewAuthor, reviewContent);
+            }
+            return resultReviews;
+        }
+
+        @Override
+        protected void onPostExecute(Review[] result) {
+            if (result != null) {
+                mReviewAdapter.clear();
+                for(Review singleReview : result) {
+                    Log.v(LOG_TAG, "Adding " + singleReview.getContent() + " to adapter");
+                    mReviewAdapter.add(singleReview);
+                }
+                mReviewAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 }
 
 class TrailerAdapter extends BaseAdapter {
@@ -273,23 +398,12 @@ class TrailerAdapter extends BaseAdapter {
         return position;
     }
 
-//    public ArrayList<Trailer> getTrailers() {
-//        return mTrailers;
-//    }
-//
-//    public void setTrailers(ArrayList<Trailer> mTrailers) {
-//        this.mTrailers = mTrailers;
-//    }
-
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi = convertView;
         if(convertView == null)
             vi = inflater.inflate(R.layout.list_item_trailer, null);
-
         TextView name = (TextView)vi.findViewById(R.id.list_item_trailer_textview);
-
         name.setText(this.getItem(position).getName());
-
         return vi;
     }
 }
@@ -314,10 +428,6 @@ class Trailer {
         this.type = type;
     }
 
-    public String getTrailerId() {
-        return trailerId;
-    }
-
     public String getKey() {
         return key;
     }
@@ -325,13 +435,69 @@ class Trailer {
     public String getName() {
         return name;
     }
+}
 
-    public String getSite() {
-        return site;
+class ReviewAdapter extends BaseAdapter {
+    // references to our reviews
+    private ArrayList<Review> mReviews = new ArrayList();
+
+    private LayoutInflater inflater = null;
+
+    public void clear() {
+        mReviews.clear();
     }
 
-    public String getType() {
-        return type;
+    public void add(Review review) {
+        mReviews.add(review);
+    }
+
+    public ReviewAdapter(Context c) {
+        inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public int getCount() {
+        return mReviews.size();
+    }
+
+    public Review getItem(int position) {
+        return mReviews.get(position);
+    }
+
+    public long getItemId(int position) {
+        return position;
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View vi = convertView;
+        if(convertView == null)
+            vi = inflater.inflate(R.layout.list_item_review, null);
+
+        TextView name = (TextView)vi.findViewById(R.id.list_item_review_content_textview);
+        name.setText(this.getItem(position).getContent());
+
+        TextView author = (TextView)vi.findViewById(R.id.list_item_review_author_textview);
+        author.setText(this.getItem(position).getAuthor());
+
+        return vi;
     }
 }
+
+class Review {
+    String author;
+    String content;
+
+    public Review(String author, String content) {
+        this.author = author;
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+
 

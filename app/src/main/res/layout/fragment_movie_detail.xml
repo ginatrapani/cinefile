@@ -50,8 +50,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dip" />
 
-        <ListView
+        <org.ginatrapani.cinefile.NestedListView
             android:id="@+id/listview_trailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip" />
+
+        <org.ginatrapani.cinefile.NestedListView
+            android:id="@+id/listview_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dip" />
