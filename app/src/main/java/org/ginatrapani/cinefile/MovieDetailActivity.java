@@ -56,10 +56,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("movie")) {
             Movie movie = intent.getParcelableExtra("movie");
 
-            SharedPreferences sharedpreferences = getSharedPreferences(FAVORITES_PREF_KEY,
+            SharedPreferences sharedPrefs = getSharedPreferences(FAVORITES_PREF_KEY,
                     Context.MODE_PRIVATE);
 
-            SharedPreferences.Editor editor = sharedpreferences.edit();
+            SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putString(new Long(movie.getId()).toString(),
                     new Long(movie.getId()).toString());
             editor.commit();
