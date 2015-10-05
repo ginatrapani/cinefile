@@ -348,7 +348,6 @@ public class PosterGridFragment extends Fragment {
                 }
                 if (result[0] != null) {
                     ((MovieDetailActivityFragment.Callback) getActivity()).setMovie(result[0]);
-                    ((MovieDetailActivityFragment.Callback) getActivity()).onItemSelected();
                 }
                 mMoviesAdapter.notifyDataSetChanged();
             }
