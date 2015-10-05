@@ -119,6 +119,7 @@ public class MovieDetailActivityFragment extends Fragment {
             });
 
             ImageButton buttonView = (ImageButton) rootView.findViewById(R.id.button_favorite);
+            buttonView.setVisibility(View.VISIBLE);
             buttonView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
