@@ -35,11 +35,15 @@ import java.util.ArrayList;
 
 public class MovieDetailActivityFragment extends Fragment {
 
+    static final String DETAIL_URI = "URI";
+
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
 
     private TrailerAdapter mTrailerAdapter;
 
     private ReviewAdapter mReviewAdapter;
+
+    private Uri mUri;
 
     public MovieDetailActivityFragment() {
     }
@@ -47,6 +51,12 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+
+        if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailActivityFragment.DETAIL_URI);
+        }
+
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -105,6 +115,18 @@ public class MovieDetailActivityFragment extends Fragment {
 
         }
         return rootView;
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri contentUri);
     }
 
     @Override
