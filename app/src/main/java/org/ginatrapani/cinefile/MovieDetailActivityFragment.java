@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -70,8 +70,8 @@ public class MovieDetailActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_trailer);
-        listView.setAdapter(mTrailerAdapter);
+        ListView trailerListView = (ListView) rootView.findViewById(R.id.listview_trailer);
+        trailerListView.setAdapter(mTrailerAdapter);
 
         mReviewAdapter = new ReviewAdapter(this.getActivity());
 
@@ -106,11 +106,11 @@ public class MovieDetailActivityFragment extends Fragment {
             Picasso.with(getActivity()).load(mMovie.getPosterPath())
                     .into(imageView);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                     Trailer trailer = mTrailerAdapter.getItem(position);
-                    Uri builtUri = Uri.parse("http://youtube.com/watch?v=" + trailer.getKey()).
+                    Uri builtUri = Uri.parse("https://www.youtube.com/watch?v=" + trailer.getKey()).
                             buildUpon().build();
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(builtUri);
@@ -118,7 +118,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 }
             });
 
-            Button buttonView = (Button) rootView.findViewById(R.id.button_favorite);
+            ImageButton buttonView = (ImageButton) rootView.findViewById(R.id.button_favorite);
             buttonView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
