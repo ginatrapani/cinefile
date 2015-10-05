@@ -65,6 +65,12 @@ public class MovieDetailActivityFragment extends Fragment {
             Log.v(LOG_TAG, "Found movie in intent");
         }
 
+        if (mMovie == null && savedInstanceState != null) {
+            // read the movie list from the saved state
+            mMovie = savedInstanceState.getParcelable(MOVIE);
+            Log.v(LOG_TAG, "Found movie in savedInstanceState");
+        }
+
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -157,6 +163,13 @@ public class MovieDetailActivityFragment extends Fragment {
             updateTrailers(mMovie.getId());
             updateReviews(mMovie.getId());
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.v(LOG_TAG, "About to save the current movie to outstate");
+        outState.putParcelable(MOVIE, mMovie);
+        super.onSaveInstanceState(outState);
     }
 
     private void updateTrailers(long movieId) {
