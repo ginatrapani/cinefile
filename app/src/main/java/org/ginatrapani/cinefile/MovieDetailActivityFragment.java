@@ -144,7 +144,9 @@ public class MovieDetailActivityFragment extends Fragment {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Movie movie);
+        public void onItemSelected();
+
+        public void setMovie(Movie movie);
     }
 
     @Override

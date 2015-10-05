@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private Movie mMovie;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                         .replace(R.id.movie_detail_container, new MovieDetailActivityFragment(),
                                 DETAILFRAGMENT_TAG).commit();
             }
+            ((MovieDetailActivityFragment.Callback) this).onItemSelected();
         } else {
             mTwoPane = false;
         }
@@ -63,7 +66,12 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     }
 
     @Override
-    public void onItemSelected(Movie movie) {
+    public void setMovie(Movie movie) {
+        mMovie = movie;
+    }
+
+    @Override
+    public void onItemSelected() {
         Log.v(LOG_TAG, "onItemSelected called");
         if (mTwoPane) {
             Log.v(LOG_TAG, "In a 2-pane layout");
@@ -71,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-            args.putParcelable(MovieDetailActivityFragment.MOVIE, movie);
+            args.putParcelable(MovieDetailActivityFragment.MOVIE, mMovie);
 
             MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
             fragment.setArguments(args);
@@ -81,9 +89,12 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .commit();
         } else {
             Log.v(LOG_TAG, "In a single pane layout");
-            Intent intent = new Intent(this, MovieDetailActivity.class)
-                    .putExtra("movie", movie);
-            startActivity(intent);
+            if (mMovie != null) {
+                Log.v(LOG_TAG, "There's a movie to show");
+                Intent intent = new Intent(this, MovieDetailActivity.class)
+                        .putExtra("movie", mMovie);
+                startActivity(intent);
+            }
         }
     }
 }

@@ -78,7 +78,9 @@ public class PosterGridFragment extends Fragment {
                 Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
 
                 ((MovieDetailActivityFragment.Callback) getActivity())
-                        .onItemSelected(clickedMovie);
+                        .setMovie(clickedMovie);
+                ((MovieDetailActivityFragment.Callback) getActivity())
+                        .onItemSelected();
             }
         });
         return rootView;
@@ -345,7 +347,7 @@ public class PosterGridFragment extends Fragment {
                     mMoviesAdapter.add(singleMovie);
                 }
                 if (result[0] != null) {
-                    ((MovieDetailActivityFragment.Callback) getActivity()).onItemSelected(result[0]);
+                    ((MovieDetailActivityFragment.Callback) getActivity()).setMovie(result[0]);
                 }
                 mMoviesAdapter.notifyDataSetChanged();
             }
