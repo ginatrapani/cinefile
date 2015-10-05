@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .commit();
         } else {
             Log.v(LOG_TAG, "In a single pane layout");
-            Intent intent = new Intent(this, MovieDetailActivityFragment.class)
+            Intent intent = new Intent(this, MovieDetailActivity.class)
                     .putExtra("movie", movie);
             startActivity(intent);
         }
