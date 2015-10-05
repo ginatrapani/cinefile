@@ -342,9 +342,12 @@ public class PosterGridFragment extends Fragment {
         protected void onPostExecute(Movie[] result) {
             if (result != null) {
                 mMoviesAdapter.clear();
-                for(Movie singleMovie : result) {
+                for (Movie singleMovie : result) {
                     //Log.v(LOG_TAG, "Adding " + singleMovie + " to adapter");
                     mMoviesAdapter.add(singleMovie);
+                }
+                if (result[0] != null) {
+                    ((MovieDetailActivityFragment.Callback) getActivity()).onItemSelected(result[0]);
                 }
                 mMoviesAdapter.notifyDataSetChanged();
             }

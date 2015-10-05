@@ -1,6 +1,6 @@
 package org.ginatrapani.cinefile;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -12,7 +12,7 @@ public class FavoritesHelper {
 
     private final String LOG_TAG = FavoritesHelper.class.getSimpleName();
 
-    public long[] getFavorites(Activity mContext) {
+    public long[] getFavorites(Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences(FAVORITES_PREF_KEY, 0);
         int size = prefs.getInt(FAVORITES_SIZE_PREF_KEY, 0);
         long[] favesArray = new long[size];
@@ -23,7 +23,7 @@ public class FavoritesHelper {
         return favesArray;
     }
 
-    public boolean saveFavorite(Activity mContext, long newFav) {
+    public boolean saveFavorite(Context mContext, long newFav) {
         long[] favesArray = getFavorites(mContext);
 
         //If new fave is already in the list, return true

@@ -3,6 +3,7 @@ package org.ginatrapani.cinefile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,6 +13,8 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     private boolean mTwoPane;
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +64,9 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     @Override
     public void onItemSelected(Movie movie) {
+        Log.v(LOG_TAG, "onItemSelected called");
         if (mTwoPane) {
+            Log.v(LOG_TAG, "In a 2-pane layout");
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
@@ -75,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         } else {
+            Log.v(LOG_TAG, "In a single pane layout");
             Intent intent = new Intent(this, MovieDetailActivityFragment.class)
                     .putExtra("movie", movie);
             startActivity(intent);

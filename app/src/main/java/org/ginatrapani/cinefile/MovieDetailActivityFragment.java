@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -43,12 +45,26 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private ReviewAdapter mReviewAdapter;
 
+    private Movie mMovie;
+
     public MovieDetailActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // The detail Activity called via intent.  Inspect the intent for movie data.
+        Intent intent = getActivity().getIntent();
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mMovie = arguments.getParcelable(MovieDetailActivityFragment.MOVIE);
+            Log.v(LOG_TAG, "Found movie in arguments");
+        } else if (intent != null && intent.hasExtra("movie")) {
+            mMovie = intent.getParcelableExtra("movie");
+            Log.v(LOG_TAG, "Found movie in intent");
+        }
+
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -63,47 +79,60 @@ public class MovieDetailActivityFragment extends Fragment {
         ListView reviewListView = (ListView) rootView.findViewById(R.id.listview_review);
         reviewListView.setAdapter(mReviewAdapter);
 
-        // The detail Activity called via intent.  Inspect the intent for movie data.
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("movie")) {
-            Movie movie = intent.getParcelableExtra("movie");
-            Log.v(LOG_TAG, "Overview string is " + movie.getOverview());
+        if (mMovie != null) {
+            Log.v(LOG_TAG, "Overview string is " + mMovie.getOverview());
             ((TextView) rootView.findViewById(R.id.detail_text))
-                    .setText(movie.getOverview());
+                    .setText(mMovie.getOverview());
             ((TextView) rootView.findViewById(R.id.movie_title))
-                    .setText(movie.getTitle());
+                    .setText(mMovie.getTitle());
             SimpleDateFormat apiReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat friendlyReleaseDateFormat = new SimpleDateFormat("MMMM d, yyyy");
 
-            String reformattedReleaseDateStr = movie.getReleaseDate();
+            String reformattedReleaseDateStr = mMovie.getReleaseDate();
             try {
                 reformattedReleaseDateStr = friendlyReleaseDateFormat
-                        .format(apiReleaseDate.parse(movie.getReleaseDate()));
+                        .format(apiReleaseDate.parse(mMovie.getReleaseDate()));
             } catch (ParseException e) {
                 //do nothing, default to what API returned
             }
             ((TextView) rootView.findViewById(R.id.movie_release))
                     .setText(reformattedReleaseDateStr);
 
-            String voteAverageString = movie.getVoteAverage()
+            String voteAverageString = mMovie.getVoteAverage()
                     + " " + getResources().getString(R.string.vote_average_suffix);
             ((TextView) rootView.findViewById(R.id.vote_average))
                     .setText(voteAverageString);
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(getActivity()).load(movie.getPosterPath())
+            Picasso.with(getActivity()).load(mMovie.getPosterPath())
                     .into(imageView);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                     Trailer trailer = mTrailerAdapter.getItem(position);
-                    Uri builtUri = Uri.parse("http://youtube.com/watch?v="+trailer.getKey()).
+                    Uri builtUri = Uri.parse("http://youtube.com/watch?v=" + trailer.getKey()).
                             buildUpon().build();
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(builtUri);
                     startActivity(intent);
                 }
             });
+
+            Button buttonView = (Button) rootView.findViewById(R.id.button_favorite);
+            buttonView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mMovie != null) {
+                        FavoritesHelper favHelper = new FavoritesHelper();
+                        favHelper.saveFavorite(v.getContext(), mMovie.getId());
+
+                        Toast.makeText(v.getContext(), "You marked " + mMovie.getTitle()
+                                + " as a favorite", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+
 
         }
         return rootView;

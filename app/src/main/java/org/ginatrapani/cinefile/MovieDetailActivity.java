@@ -55,17 +55,4 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    public void onClickFavorite(View v) {
-        Intent intent = this.getIntent();
-        if (intent != null && intent.hasExtra("movie")) {
-            Movie movie = intent.getParcelableExtra("movie");
-
-            FavoritesHelper favHelper = new FavoritesHelper();
-            favHelper.saveFavorite(this, movie.getId());
-
-            Toast.makeText(this, "You marked " + movie.getTitle() + " as a favorite",
-                Toast.LENGTH_LONG).show();
-        }
-    }
 }
