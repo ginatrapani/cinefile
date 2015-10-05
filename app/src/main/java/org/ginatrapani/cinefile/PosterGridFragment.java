@@ -1,7 +1,6 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -78,9 +77,8 @@ public class PosterGridFragment extends Fragment {
                                     int position, long id) {
                 Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
 
-                Intent viewMovieDetailsIntent = new Intent(getActivity(), MovieDetailActivity.class)
-                        .putExtra("movie", clickedMovie);
-                startActivity(viewMovieDetailsIntent);
+                ((MovieDetailActivityFragment.Callback) getActivity())
+                        .onItemSelected(clickedMovie);
             }
         });
         return rootView;
