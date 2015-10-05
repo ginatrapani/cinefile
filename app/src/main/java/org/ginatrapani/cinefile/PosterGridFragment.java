@@ -129,8 +129,13 @@ public class PosterGridFragment extends Fragment {
         protected Movie[] doInBackground(String... params) {
             String sortOrder = params[0];
             if (sortOrder.equals("favorites")) {
-                Movie[] moviesToShow = new Movie[1];
-                moviesToShow[0] = getMovieFromAPI(135397);
+                FavoritesHelper favHelper = new FavoritesHelper();
+                long[] favesArray = favHelper.getFavorites(getActivity());
+                Movie[] moviesToShow = new Movie[favesArray.length];
+                int i;
+                for(i=0; i < favesArray.length; i++) {
+                    moviesToShow[i] = getMovieFromAPI(favesArray[i]);
+                }
                 return moviesToShow;
             } else {
                 return getMoviesFromAPI(sortOrder);

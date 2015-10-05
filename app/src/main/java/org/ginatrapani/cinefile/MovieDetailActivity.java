@@ -1,8 +1,6 @@
 package org.ginatrapani.cinefile;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -11,8 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 public class MovieDetailActivity extends AppCompatActivity {
-    private final String FAVORITES_PREF_KEY = "FAVES";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +52,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("movie")) {
             Movie movie = intent.getParcelableExtra("movie");
 
-            SharedPreferences sharedPrefs = getSharedPreferences(FAVORITES_PREF_KEY,
-                    Context.MODE_PRIVATE);
-
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putString(new Long(movie.getId()).toString(),
-                    new Long(movie.getId()).toString());
-            editor.commit();
+            FavoritesHelper favHelper = new FavoritesHelper();
+            favHelper.saveFavorite(this, movie.getId());
 
             Toast.makeText(this, "You marked " + movie.getTitle() + " as a favorite",
                 Toast.LENGTH_LONG).show();
