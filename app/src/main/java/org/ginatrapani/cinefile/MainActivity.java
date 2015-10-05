@@ -1,7 +1,6 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -61,13 +60,13 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     }
 
     @Override
-    public void onItemSelected(Uri contentUri) {
+    public void onItemSelected(Movie movie) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-            args.putParcelable(MovieDetailActivityFragment.DETAIL_URI, contentUri);
+            args.putParcelable(MovieDetailActivityFragment.MOVIE, movie);
 
             MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
             fragment.setArguments(args);
@@ -77,9 +76,8 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .commit();
         } else {
             Intent intent = new Intent(this, MovieDetailActivityFragment.class)
-                    .setData(contentUri);
+                    .putExtra("movie", movie);
             startActivity(intent);
         }
     }
-
 }

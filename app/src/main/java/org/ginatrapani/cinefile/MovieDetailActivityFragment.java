@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 public class MovieDetailActivityFragment extends Fragment {
 
-    static final String DETAIL_URI = "URI";
+    static final String MOVIE = "MOVIE";
 
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
 
@@ -43,20 +43,12 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private ReviewAdapter mReviewAdapter;
 
-    private Uri mUri;
-
     public MovieDetailActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle arguments = getArguments();
-
-        if (arguments != null) {
-            mUri = arguments.getParcelable(MovieDetailActivityFragment.DETAIL_URI);
-        }
-
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -105,7 +97,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                     Trailer trailer = mTrailerAdapter.getItem(position);
-                    Uri builtUri = Uri.parse("http://youtube.com//watch?v="+trailer.getKey()).
+                    Uri builtUri = Uri.parse("http://youtube.com/watch?v="+trailer.getKey()).
                             buildUpon().build();
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(builtUri);
@@ -126,7 +118,7 @@ public class MovieDetailActivityFragment extends Fragment {
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri contentUri);
+        public void onItemSelected(Movie movie);
     }
 
     @Override
