@@ -131,9 +131,6 @@ public class MovieDetailActivityFragment extends Fragment {
                     }
                 }
             });
-
-
-
         }
         return rootView;
     }
@@ -153,11 +150,9 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("movie")) {
-            Movie movie = intent.getParcelableExtra("movie");
-            updateTrailers(movie.getId());
-            updateReviews(movie.getId());
+        if (mMovie != null) {
+            updateTrailers(mMovie.getId());
+            updateReviews(mMovie.getId());
         }
     }
 
@@ -350,7 +345,7 @@ public class MovieDetailActivityFragment extends Fragment {
                     return null;
                 }
                 reviewsJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Trailers JSON " + reviewsJsonStr);
+                Log.v(LOG_TAG, "Reviews JSON " + reviewsJsonStr);
                 try {
                     return getReviewDataFromJson(reviewsJsonStr);
                 } catch (JSONException e) {
