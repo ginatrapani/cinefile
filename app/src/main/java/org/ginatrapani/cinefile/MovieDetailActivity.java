@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -17,7 +15,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-
             Bundle arguments = new Bundle();
             arguments.putParcelable(MovieDetailActivityFragment.MOVIE, getIntent().getData());
 
