@@ -160,6 +160,8 @@ public class MovieDetailActivityFragment extends Fragment {
          */
         public void onItemSelected();
 
+        public void onMovieListLoaded(Movie firstMovie);
+
         public void setMovie(Movie movie);
     }
 

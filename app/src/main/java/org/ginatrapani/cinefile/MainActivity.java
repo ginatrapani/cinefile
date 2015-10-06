@@ -76,6 +76,27 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     }
 
     @Override
+    public void onMovieListLoaded(Movie firstMovie) {
+        Log.v(LOG_TAG, "onMovieListLoaded called");
+        if (mTwoPane) {
+            Log.v(LOG_TAG, "In a 2-pane layout");
+            setMovie(firstMovie);
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle args = new Bundle();
+            args.putParcelable(MovieDetailActivityFragment.MOVIE, firstMovie);
+
+            MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }
+    }
+
+    @Override
     public void onItemSelected() {
         Log.v(LOG_TAG, "onItemSelected called");
         if (mTwoPane) {
