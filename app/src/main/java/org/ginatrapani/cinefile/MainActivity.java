@@ -21,6 +21,11 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null) {
+            // read the movie list from the saved state
+            mMovie = savedInstanceState.getParcelable(MovieDetailActivityFragment.MOVIE);
+        }
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.movie_detail_container) != null) {
@@ -96,5 +101,14 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                 startActivity(intent);
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mMovie != null) {
+            Log.v(LOG_TAG, "Saving movie to outstate");
+            outState.putParcelable(MovieDetailActivityFragment.MOVIE, mMovie);
+        }
+        super.onSaveInstanceState(outState);
     }
 }
