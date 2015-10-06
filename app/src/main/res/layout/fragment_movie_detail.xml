@@ -48,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:onClick="onClickFavorite"
                     android:background="@android:color/background_light"
-                    android:src="@android:drawable/btn_star_big_on"
+                    android:src="@android:drawable/btn_star_big_off"
                     android:visibility="gone"/>
             </LinearLayout>
 

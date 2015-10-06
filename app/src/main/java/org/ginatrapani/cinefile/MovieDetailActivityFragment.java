@@ -125,15 +125,21 @@ public class MovieDetailActivityFragment extends Fragment {
                 }
             });
 
-            ImageButton buttonView = (ImageButton) rootView.findViewById(R.id.button_favorite);
-            buttonView.setVisibility(View.VISIBLE);
-            buttonView.setOnClickListener(new View.OnClickListener() {
+            ImageButton faveButton = (ImageButton) rootView.findViewById(R.id.button_favorite);
+
+            FavoritesHelper favHelper = new FavoritesHelper();
+            if (favHelper.isFavorite(getActivity(), mMovie.getId())) {
+                faveButton.setImageResource(android.R.drawable.btn_star_big_on);
+            }
+            faveButton.setVisibility(View.VISIBLE);
+            faveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mMovie != null) {
                         FavoritesHelper favHelper = new FavoritesHelper();
                         favHelper.saveFavorite(v.getContext(), mMovie.getId());
 
+                        ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
                         Toast.makeText(v.getContext(), "You marked " + mMovie.getTitle()
                                 + " as a favorite", Toast.LENGTH_LONG).show();
                     }

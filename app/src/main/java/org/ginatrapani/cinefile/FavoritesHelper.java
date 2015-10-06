@@ -23,6 +23,19 @@ public class FavoritesHelper {
         return favesArray;
     }
 
+    public boolean isFavorite(Context mContext, long movieId) {
+        long[] favesArray = getFavorites(mContext);
+        //If ID is in the list, return true
+        for(int i = 0; i < favesArray.length; i++) {
+            Log.v(LOG_TAG, "Checking if " + movieId + " = " + favesArray[i]);
+            if (favesArray[i] == movieId) {
+                Log.v(LOG_TAG, "fave exists");
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean saveFavorite(Context mContext, long newFav) {
         long[] favesArray = getFavorites(mContext);
 
