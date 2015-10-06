@@ -58,10 +58,10 @@ public class MovieDetailActivityFragment extends Fragment {
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            mMovie = arguments.getParcelable(MovieDetailActivityFragment.MOVIE);
+            mMovie = arguments.getParcelable(MOVIE);
             Log.v(LOG_TAG, "Found movie in arguments");
-        } else if (intent != null && intent.hasExtra("movie")) {
-            mMovie = intent.getParcelableExtra("movie");
+        } else if (intent != null && intent.hasExtra(MOVIE)) {
+            mMovie = intent.getParcelableExtra(MOVIE);
             Log.v(LOG_TAG, "Found movie in intent");
         }
 
@@ -457,7 +457,7 @@ class TrailerAdapter extends BaseAdapter {
         if(convertView == null)
             vi = inflater.inflate(R.layout.list_item_trailer, null);
         TextView name = (TextView)vi.findViewById(R.id.list_item_trailer_textview);
-        name.setText(this.getItem(position).getName());
+        name.setText("▶ " + this.getItem(position).getName());
         return vi;
     }
 }

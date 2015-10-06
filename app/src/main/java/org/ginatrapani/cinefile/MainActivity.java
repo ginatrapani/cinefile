@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             if (mMovie != null) {
                 Log.v(LOG_TAG, "There's a movie to show");
                 Intent intent = new Intent(this, MovieDetailActivity.class)
-                        .putExtra("movie", mMovie);
+                        .putExtra(MovieDetailActivityFragment.MOVIE, mMovie);
                 startActivity(intent);
             }
         }
