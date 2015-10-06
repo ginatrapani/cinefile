@@ -1,5 +1,6 @@
 package org.ginatrapani.cinefile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -428,6 +429,8 @@ class TrailerAdapter extends BaseAdapter {
 
     private LayoutInflater inflater = null;
 
+    private Activity mContext;
+
     public void clear() {
         mTrailers.clear();
     }
@@ -436,8 +439,9 @@ class TrailerAdapter extends BaseAdapter {
         mTrailers.add(trailer);
     }
 
-    public TrailerAdapter(Context c) {
+    public TrailerAdapter(Activity c) {
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mContext = c;
     }
 
     public int getCount() {
@@ -460,7 +464,17 @@ class TrailerAdapter extends BaseAdapter {
         name.setText("▶ " + this.getItem(position).getName());
         return vi;
     }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if (getCount() > 0) {
+            TextView headerTextView = (TextView) mContext.findViewById(R.id.trailer_header);
+            headerTextView.setVisibility(View.VISIBLE);
+        }
+    }
 }
+
 
 class Trailer {
 
@@ -497,6 +511,8 @@ class ReviewAdapter extends BaseAdapter {
 
     private LayoutInflater inflater = null;
 
+    private Activity mContext;
+
     public void clear() {
         mReviews.clear();
     }
@@ -505,8 +521,9 @@ class ReviewAdapter extends BaseAdapter {
         mReviews.add(review);
     }
 
-    public ReviewAdapter(Context c) {
+    public ReviewAdapter(Activity c) {
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mContext = c;
     }
 
     public int getCount() {
@@ -533,6 +550,15 @@ class ReviewAdapter extends BaseAdapter {
         author.setText(this.getItem(position).getAuthor());
 
         return vi;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if (getCount() > 0) {
+            TextView headerTextView = (TextView) mContext.findViewById(R.id.review_header);
+            headerTextView.setVisibility(View.VISIBLE);
+        }
     }
 }
 
