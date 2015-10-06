@@ -35,6 +35,46 @@ public class FavoritesHelper {
         return false;
     }
 
+    public boolean unFavorite(Context mContext, long movieId) {
+        long[] favesArray = getFavorites(mContext);
+
+        //If new fave is not already in the list, return true
+        boolean isInList = false;
+        for(int i = 0; i < favesArray.length; i++) {
+            //Log.v(LOG_TAG, "Checking if " + newFav + " = " + favesArray[i]);
+            if (favesArray[i] == movieId) {
+                //Log.v(LOG_TAG, "fave exists");
+                isInList = true;
+            }
+        }
+        if (isInList) {
+            //Create a new faves array and store it
+            long[] newFavesArray = new long[favesArray.length-1];
+            //Load existing faves into new faves array
+            int j = 0;
+            for(int i = 0; i < favesArray.length; i++) {
+                if (favesArray[i] != movieId) {
+                    newFavesArray[j] = favesArray[i];
+                    j++;
+                }
+            }
+            int size = favesArray.length - 1;
+
+            SharedPreferences prefs = mContext.getSharedPreferences(FAVORITES_PREF_KEY, 0);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(FAVORITES_SIZE_PREF_KEY, size);
+            //Log.v(LOG_TAG, "putting total faves " + size);
+
+            for(int i=0;i<size;i++) {
+                editor.putString("fav_array_" + i, new Long(newFavesArray[i]).toString());
+                //Log.v(LOG_TAG, "putting fave " + newFavesArray[i]);
+            }
+            return editor.commit();
+        } else {
+            return true;
+        }
+    }
+
     public boolean saveFavorite(Context mContext, long newFav) {
         long[] favesArray = getFavorites(mContext);
 

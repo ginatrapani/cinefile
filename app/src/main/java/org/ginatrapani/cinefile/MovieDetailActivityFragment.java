@@ -138,11 +138,19 @@ public class MovieDetailActivityFragment extends Fragment {
                 public void onClick(View v) {
                     if (mMovie != null) {
                         FavoritesHelper favHelper = new FavoritesHelper();
-                        favHelper.saveFavorite(v.getContext(), mMovie.getId());
+                        if (favHelper.isFavorite(getActivity(), mMovie.getId())) {
+                            favHelper.unFavorite(v.getContext(), mMovie.getId());
 
-                        ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
-                        Toast.makeText(v.getContext(), "You marked " + mMovie.getTitle()
-                                + " as a favorite", Toast.LENGTH_LONG).show();
+                            ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_off);
+                            Toast.makeText(v.getContext(), "You unfavorited " + mMovie.getTitle()
+                                    + ".", Toast.LENGTH_LONG).show();
+                        } else {
+                            favHelper.saveFavorite(v.getContext(), mMovie.getId());
+
+                            ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
+                            Toast.makeText(v.getContext(), "You favorited " + mMovie.getTitle()
+                                    + ".", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             });
