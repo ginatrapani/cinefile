@@ -110,7 +110,8 @@ public class MovieDetailActivityFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.vote_average))
                     .setText(voteAverageString);
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(getActivity()).load(mMovie.getPosterPath())
+            Picasso.with(getActivity()).load(mMovie.getPosterPath()).
+                    resize(mMovie.getDefaultWidth() * 2, mMovie.getDefaultHeight() * 2)
                     .into(imageView);
 
             trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
