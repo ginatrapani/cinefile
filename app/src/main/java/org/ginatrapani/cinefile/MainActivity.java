@@ -3,7 +3,6 @@ package org.ginatrapani.cinefile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -77,9 +76,9 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     @Override
     public void onMovieListLoaded(Movie firstMovie) {
-        Log.v(LOG_TAG, "onMovieListLoaded called");
+        //Log.v(LOG_TAG, "onMovieListLoaded called");
         if (mTwoPane) {
-            Log.v(LOG_TAG, "In a 2-pane layout");
+            //Log.v(LOG_TAG, "In a 2-pane layout");
             setMovie(firstMovie);
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -98,9 +97,9 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     @Override
     public void onItemSelected() {
-        Log.v(LOG_TAG, "onItemSelected called");
+        //Log.v(LOG_TAG, "onItemSelected called");
         if (mTwoPane) {
-            Log.v(LOG_TAG, "In a 2-pane layout");
+            //Log.v(LOG_TAG, "In a 2-pane layout");
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
@@ -114,9 +113,9 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         } else {
-            Log.v(LOG_TAG, "In a single pane layout");
+            //Log.v(LOG_TAG, "In a single pane layout");
             if (mMovie != null) {
-                Log.v(LOG_TAG, "There's a movie to show");
+                //Log.v(LOG_TAG, "There's a movie to show");
                 Intent intent = new Intent(this, MovieDetailActivity.class)
                         .putExtra(MovieDetailActivityFragment.MOVIE, mMovie);
                 startActivity(intent);
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mMovie != null) {
-            Log.v(LOG_TAG, "Saving movie to outstate");
+            //Log.v(LOG_TAG, "Saving movie to outstate");
             outState.putParcelable(MovieDetailActivityFragment.MOVIE, mMovie);
         }
         super.onSaveInstanceState(outState);

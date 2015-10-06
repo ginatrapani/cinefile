@@ -60,16 +60,16 @@ public class MovieDetailActivityFragment extends Fragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             mMovie = arguments.getParcelable(MOVIE);
-            Log.v(LOG_TAG, "Found movie in arguments");
+            //Log.v(LOG_TAG, "Found movie in arguments");
         } else if (intent != null && intent.hasExtra(MOVIE)) {
             mMovie = intent.getParcelableExtra(MOVIE);
-            Log.v(LOG_TAG, "Found movie in intent");
+            //Log.v(LOG_TAG, "Found movie in intent");
         }
 
         if (mMovie == null && savedInstanceState != null) {
             // read the movie list from the saved state
             mMovie = savedInstanceState.getParcelable(MOVIE);
-            Log.v(LOG_TAG, "Found movie in savedInstanceState");
+            //Log.v(LOG_TAG, "Found movie in savedInstanceState");
         }
 
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
@@ -87,7 +87,7 @@ public class MovieDetailActivityFragment extends Fragment {
         reviewListView.setAdapter(mReviewAdapter);
 
         if (mMovie != null) {
-            Log.v(LOG_TAG, "Overview string is " + mMovie.getOverview());
+            //Log.v(LOG_TAG, "Overview string is " + mMovie.getOverview());
             ((TextView) rootView.findViewById(R.id.detail_text))
                     .setText(mMovie.getOverview());
             ((TextView) rootView.findViewById(R.id.movie_title))
@@ -177,7 +177,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.v(LOG_TAG, "About to save the current movie to outstate");
+        //Log.v(LOG_TAG, "About to save the current movie to outstate");
         outState.putParcelable(MOVIE, mMovie);
         super.onSaveInstanceState(outState);
     }
@@ -215,7 +215,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+                //Log.v(LOG_TAG, "Built URI " + builtUri.toString());
 
                 // Create the request to TheMovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -244,7 +244,7 @@ public class MovieDetailActivityFragment extends Fragment {
                     return null;
                 }
                 trailersJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Trailers JSON " + trailersJsonStr);
+                //Log.v(LOG_TAG, "Trailers JSON " + trailersJsonStr);
                 try {
                     return getTrailerDataFromJson(trailersJsonStr);
                 } catch (JSONException e) {
@@ -293,7 +293,7 @@ public class MovieDetailActivityFragment extends Fragment {
             for(int i = 0; i < trailersArray.length(); i++) {
                 // Get the JSON object representing a trailer
                 JSONObject singleTrailer = trailersArray.getJSONObject(i);
-                Log.v(LOG_TAG, "Single Trailer JSON Object " + singleTrailer.toString());
+                //Log.v(LOG_TAG, "Single Trailer JSON Object " + singleTrailer.toString());
                 String trailerId = singleTrailer.getString(TMDB_TRAILER_ID);
                 String key = singleTrailer.getString(TMDB_TRAILER_KEY);
                 String name = singleTrailer.getString(TMDB_TRAILER_NAME);
@@ -309,7 +309,7 @@ public class MovieDetailActivityFragment extends Fragment {
             if (result != null) {
                 mTrailerAdapter.clear();
                 for(Trailer singleTrailer : result) {
-                    Log.v(LOG_TAG, "Adding " + singleTrailer.getName() + " to adapter");
+                    //Log.v(LOG_TAG, "Adding " + singleTrailer.getName() + " to adapter");
                     mTrailerAdapter.add(singleTrailer);
                 }
                 mTrailerAdapter.notifyDataSetChanged();
@@ -342,7 +342,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+                //Log.v(LOG_TAG, "Built URI " + builtUri.toString());
 
                 // Create the request to TheMovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -371,7 +371,7 @@ public class MovieDetailActivityFragment extends Fragment {
                     return null;
                 }
                 reviewsJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Reviews JSON " + reviewsJsonStr);
+                //Log.v(LOG_TAG, "Reviews JSON " + reviewsJsonStr);
                 try {
                     return getReviewDataFromJson(reviewsJsonStr);
                 } catch (JSONException e) {
@@ -410,7 +410,7 @@ public class MovieDetailActivityFragment extends Fragment {
             for(int i = 0; i < reviewsArray.length(); i++) {
                 // Get the JSON object representing a review
                 JSONObject singleReview = reviewsArray.getJSONObject(i);
-                Log.v(LOG_TAG, "Single Review JSON Object " + singleReview.toString());
+                //Log.v(LOG_TAG, "Single Review JSON Object " + singleReview.toString());
                 String reviewContent = singleReview.getString(TMDB_REVIEW_CONTENT);
                 String reviewAuthor = singleReview.getString(TMDB_REVIEW_AUTHOR);
                 resultReviews[i] = new Review(reviewAuthor, reviewContent);
@@ -423,7 +423,7 @@ public class MovieDetailActivityFragment extends Fragment {
             if (result != null) {
                 mReviewAdapter.clear();
                 for(Review singleReview : result) {
-                    Log.v(LOG_TAG, "Adding " + singleReview.getContent() + " to adapter");
+                    //Log.v(LOG_TAG, "Adding " + singleReview.getContent() + " to adapter");
                     mReviewAdapter.add(singleReview);
                 }
                 mReviewAdapter.notifyDataSetChanged();

@@ -2,7 +2,6 @@ package org.ginatrapani.cinefile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class FavoritesHelper {
 
@@ -18,7 +17,7 @@ public class FavoritesHelper {
         long[] favesArray = new long[size];
         for(int i=0; i<size; i++) {
             favesArray[i] = Long.parseLong(prefs.getString("fav_array_" + i, null));
-            Log.v(LOG_TAG, "getting fave " + favesArray[i]);
+            //Log.v(LOG_TAG, "getting fave " + favesArray[i]);
         }
         return favesArray;
     }
@@ -27,9 +26,9 @@ public class FavoritesHelper {
         long[] favesArray = getFavorites(mContext);
         //If ID is in the list, return true
         for(int i = 0; i < favesArray.length; i++) {
-            Log.v(LOG_TAG, "Checking if " + movieId + " = " + favesArray[i]);
+            //Log.v(LOG_TAG, "Checking if " + movieId + " = " + favesArray[i]);
             if (favesArray[i] == movieId) {
-                Log.v(LOG_TAG, "fave exists");
+                //Log.v(LOG_TAG, "fave exists");
                 return true;
             }
         }
@@ -41,9 +40,9 @@ public class FavoritesHelper {
 
         //If new fave is already in the list, return true
         for(int i = 0; i < favesArray.length; i++) {
-            Log.v(LOG_TAG, "Checking if " + newFav + " = " + favesArray[i]);
+            //Log.v(LOG_TAG, "Checking if " + newFav + " = " + favesArray[i]);
             if (favesArray[i] == newFav) {
-                Log.v(LOG_TAG, "fave already exists");
+                //Log.v(LOG_TAG, "fave already exists");
                 return true;
             }
         }
@@ -61,11 +60,11 @@ public class FavoritesHelper {
         SharedPreferences prefs = mContext.getSharedPreferences(FAVORITES_PREF_KEY, 0);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(FAVORITES_SIZE_PREF_KEY, size);
-        Log.v(LOG_TAG, "putting total faves " + size);
+        //Log.v(LOG_TAG, "putting total faves " + size);
 
         for(int i=0;i<size;i++) {
             editor.putString("fav_array_" + i, new Long(newFavesArray[i]).toString());
-            Log.v(LOG_TAG, "putting fave " + newFavesArray[i]);
+            //Log.v(LOG_TAG, "putting fave " + newFavesArray[i]);
         }
         return editor.commit();
     }

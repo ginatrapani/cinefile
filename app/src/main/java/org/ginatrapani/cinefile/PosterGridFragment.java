@@ -326,7 +326,7 @@ public class PosterGridFragment extends Fragment {
             final String TMDB_RELEASE = "release_date";
             final String TMDB_VOTE_AVG = "vote_average";
 
-            Log.v(LOG_TAG, "Single Movie JSON Object " + movieJsonObj.toString());
+            //Log.v(LOG_TAG, "Single Movie JSON Object " + movieJsonObj.toString());
             String posterPath = movieJsonObj.getString(TMDB_POSTER_PATH);
             long movieId = movieJsonObj.getLong(TMDB_MOVIE_ID);
             String overview = movieJsonObj.getString(TMDB_OVERVIEW);
