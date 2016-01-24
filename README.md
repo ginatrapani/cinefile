@@ -1,6 +1,6 @@
 # Cinefile
 
-A simple application that browses popular movies by presenting a grid of movie posters. All movie information comes from the (The Movie Database (TMDb))[https://www.themoviedb.org].
+A simple application that browses popular movies by presenting a grid of movie posters. All movie information comes from the [The Movie Database (TMDb)](https://www.themoviedb.org).
 
 ## Not a production app!
 
