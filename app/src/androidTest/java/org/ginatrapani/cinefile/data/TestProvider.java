@@ -259,6 +259,7 @@ public class TestProvider extends AndroidTestCase {
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, "The overview for Movie " + i);
             movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, "1/1/2016");
             movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, i);
+            movieValues.put(MovieEntry.COLUMN_POPULARITY, i);
             returnContentValues[i] = movieValues;
         }
         return returnContentValues;

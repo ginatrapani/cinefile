@@ -33,6 +33,10 @@ public class Movie implements Parcelable {
 
     private static final String KEY_VOTE_AVERAGE = "vote_average";
 
+    private String popularity;
+
+    private static final String KEY_POPULARITY = "popularity";
+
     private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
     public final int defaultWidth = 185;
     public final int defaultHeight = 278;
@@ -51,7 +55,8 @@ public class Movie implements Parcelable {
                     return new Movie( bundle.getLong(KEY_MOVIE_ID), bundle.getString(KEY_POSTER_PATH),
                             bundle.getString(KEY_OVERVIEW), bundle.getString(KEY_TITLE),
                             bundle.getString(KEY_RELEASE_DATE),
-                            bundle.getString(KEY_VOTE_AVERAGE));
+                            bundle.getString(KEY_VOTE_AVERAGE),
+                            bundle.getString(KEY_POPULARITY));
                 }
 
                 public Movie[] newArray(int size) {
@@ -61,13 +66,14 @@ public class Movie implements Parcelable {
 
 
     public Movie(long movieId, String posterPath, String overview, String title, String releaseDate,
-                 String voteAverage) {
+                 String voteAverage, String popularity) {
         this.movieId = movieId;
         this.posterPath = this.posterDomainPath + posterPath;
         this.overview = overview;
         this.title = title;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
+        this.popularity = popularity;
     }
 
     public String getPosterPath() {
@@ -92,6 +98,10 @@ public class Movie implements Parcelable {
 
     public String getVoteAverage() {
         return voteAverage;
+    }
+
+    public String getPopularity() {
+        return popularity;
     }
 
     public int getDefaultWidth() {

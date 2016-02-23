@@ -1,12 +1,18 @@
 package org.ginatrapani.cinefile.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.ginatrapani.cinefile.FavoritesHelper;
 import org.ginatrapani.cinefile.MovieDetailActivityFragment;
+import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.ginatrapani.cinefile.R;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Vector;
 
 /**
  * Created by ginatrapani on 2/22/16.
@@ -219,12 +226,61 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         JSONObject moviesJson = new JSONObject(moviesJsonStr);
         JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
+        // Insert the new weather information into the database
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(moviesArray.length());
+
         Movie[] resultMovies = new Movie[moviesArray.length()];
         for(int i = 0; i < moviesArray.length(); i++) {
             // Get the JSON object representing a movie
             JSONObject singleMovie = moviesArray.getJSONObject(i);
             resultMovies[i] = getMovieFromJSONObject(singleMovie);
+
+            ContentValues movieValues = new ContentValues();
+
+            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, resultMovies[i].getPosterPath());
+            movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, resultMovies[i].getVoteAverage());
+            movieValues.put(MovieEntry.COLUMN_OVERVIEW, resultMovies[i].getOverview());
+            movieValues.put(MovieEntry.COLUMN_TITLE, resultMovies[i].getTitle());
+            movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, resultMovies[i].getReleaseDate());
+            movieValues.put(MovieEntry.COLUMN_POPULARITY, resultMovies[i].getPopularity());
+
+            cVVector.add(movieValues);
         }
+
+        // add to database
+        if ( cVVector.size() > 0 ) {
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
+        }
+
+        // Sort order:  Ascending, by date.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String sortOrder = prefs.getString(mContext.getString(R.string.pref_key_sort),
+                mContext.getString(R.string.pref_default_sort));
+
+        if (sortOrder.equals("vote_average.desc")) {
+            sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE;
+        } else if (sortOrder.equals("popularity.desc")) {
+            sortOrder = MovieEntry.COLUMN_POPULARITY;
+        }
+        sortOrder += " DESC";
+        Uri moviesUri = MovieEntry.CONTENT_URI;
+
+        // Students: Uncomment the next lines to display what what you stored in the bulkInsert
+        Cursor cur = mContext.getContentResolver().query(moviesUri, null, null, null, sortOrder);
+
+        cVVector = new Vector<ContentValues>(cur.getCount());
+        if ( cur.moveToFirst() ) {
+            do {
+                ContentValues cv = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cur, cv);
+                cVVector.add(cv);
+            } while (cur.moveToNext());
+        }
+
+        Log.d(LOG_TAG, "FetchMoviesTask Complete. " + cVVector.size() + " Inserted");
+
         return resultMovies;
     }
 
@@ -235,6 +291,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         final String TMDB_TITLE = "original_title";
         final String TMDB_RELEASE = "release_date";
         final String TMDB_VOTE_AVG = "vote_average";
+        final String TMDB_POPULARITY = "popularity";
 
         //Log.v(LOG_TAG, "Single Movie JSON Object " + movieJsonObj.toString());
         String posterPath = movieJsonObj.getString(TMDB_POSTER_PATH);
@@ -243,9 +300,10 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         String title = movieJsonObj.getString(TMDB_TITLE);
         String releaseDate = movieJsonObj.getString(TMDB_RELEASE);
         String voteAverage = movieJsonObj.getString(TMDB_VOTE_AVG);
+        String popularity = movieJsonObj.getString(TMDB_POPULARITY);
 
         return new Movie(movieId, posterPath, overview, title, releaseDate,
-                voteAverage);
+                voteAverage, popularity);
     }
 
     @Override
