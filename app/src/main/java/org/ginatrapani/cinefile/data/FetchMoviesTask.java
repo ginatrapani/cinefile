@@ -12,8 +12,8 @@ import android.util.Log;
 
 import org.ginatrapani.cinefile.FavoritesHelper;
 import org.ginatrapani.cinefile.MovieDetailActivityFragment;
-import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.ginatrapani.cinefile.R;
+import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -222,6 +222,13 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
     private Movie[] getMoviesFromJsonStr(String moviesJsonStr)
             throws JSONException {
         final String TMDB_RESULTS = "results";
+        final String TMDB_POSTER_PATH = "poster_path";
+        final String TMDB_MOVIE_ID = "id";
+        final String TMDB_OVERVIEW = "overview";
+        final String TMDB_TITLE = "original_title";
+        final String TMDB_RELEASE = "release_date";
+        final String TMDB_VOTE_AVG = "vote_average";
+        final String TMDB_POPULARITY = "popularity";
 
         JSONObject moviesJson = new JSONObject(moviesJsonStr);
         JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
@@ -229,20 +236,18 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         // Insert the new weather information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(moviesArray.length());
 
-        Movie[] resultMovies = new Movie[moviesArray.length()];
         for(int i = 0; i < moviesArray.length(); i++) {
             // Get the JSON object representing a movie
             JSONObject singleMovie = moviesArray.getJSONObject(i);
-            resultMovies[i] = getMovieFromJSONObject(singleMovie);
 
             ContentValues movieValues = new ContentValues();
 
-            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, resultMovies[i].getPosterPath());
-            movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, resultMovies[i].getVoteAverage());
-            movieValues.put(MovieEntry.COLUMN_OVERVIEW, resultMovies[i].getOverview());
-            movieValues.put(MovieEntry.COLUMN_TITLE, resultMovies[i].getTitle());
-            movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, resultMovies[i].getReleaseDate());
-            movieValues.put(MovieEntry.COLUMN_POPULARITY, resultMovies[i].getPopularity());
+            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, singleMovie.getString(TMDB_POSTER_PATH));
+            movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, singleMovie.getString(TMDB_VOTE_AVG));
+            movieValues.put(MovieEntry.COLUMN_OVERVIEW, singleMovie.getString(TMDB_OVERVIEW));
+            movieValues.put(MovieEntry.COLUMN_TITLE, singleMovie.getString(TMDB_TITLE));
+            movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, singleMovie.getString(TMDB_RELEASE));
+            movieValues.put(MovieEntry.COLUMN_POPULARITY, singleMovie.getString(TMDB_POPULARITY));
 
             cVVector.add(movieValues);
         }
@@ -281,6 +286,23 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         Log.d(LOG_TAG, "FetchMoviesTask Complete. " + cVVector.size() + " Inserted");
 
+        Movie[] resultMovies = convertContentValuesToMovies(cVVector);
+        return resultMovies;
+    }
+
+    private Movie[] convertContentValuesToMovies(Vector<ContentValues> cvv) {
+        Movie[] resultMovies = new Movie[cvv.size()];
+        for ( int i = 0; i < cvv.size(); i++ ) {
+            ContentValues movieValues = cvv.elementAt(i);
+            resultMovies[i] = new Movie(movieValues.getAsInteger(MovieEntry._ID),
+                    movieValues.getAsString(MovieEntry.COLUMN_POSTER_PATH),
+                    movieValues.getAsString(MovieEntry.COLUMN_OVERVIEW),
+                    movieValues.getAsString(MovieEntry.COLUMN_TITLE),
+                    movieValues.getAsString(MovieEntry.COLUMN_RELEASE_DATE),
+                    movieValues.getAsString(MovieEntry.COLUMN_VOTE_AVERAGE),
+                    movieValues.getAsString(MovieEntry.COLUMN_POPULARITY)
+                );
+        }
         return resultMovies;
     }
 
