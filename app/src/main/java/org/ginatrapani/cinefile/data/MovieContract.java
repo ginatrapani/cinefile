@@ -46,6 +46,8 @@ public class MovieContract {
 
         public static final String COLUMN_POPULARITY = "popularity";
 
+        public static final String COLUMN_TMDB_ID = "tmdb_id";
+
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }

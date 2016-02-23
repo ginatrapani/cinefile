@@ -27,8 +27,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
                 MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                // the ID of the location entry associated with this weather data
+                MovieEntry.COLUMN_TMDB_ID + " INT(11) NOT NULL, " +
                 MovieEntry.COLUMN_TITLE + " VARCHAR(255) NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_POSTER_PATH + " VARCHAR(255) NOT NULL, " +

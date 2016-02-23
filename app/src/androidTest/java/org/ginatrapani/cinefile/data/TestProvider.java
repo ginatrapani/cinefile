@@ -255,6 +255,7 @@ public class TestProvider extends AndroidTestCase {
         for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
             ContentValues movieValues = new ContentValues();
             movieValues.put(MovieEntry.COLUMN_POSTER_PATH, "https://example.com/"+i+".jpg");
+            movieValues.put(MovieEntry.COLUMN_TMDB_ID, "1003");
             movieValues.put(MovieEntry.COLUMN_TITLE, "Movie "+i);
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, "The overview for Movie " + i);
             movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, "1/1/2016");

@@ -22,12 +22,13 @@ public class MovieProvider extends ContentProvider {
     //movies.id = ?
     private static final String sMovieIdSelection =
             MovieContract.MovieEntry.TABLE_NAME+
-                    "." + MovieContract.MovieEntry._ID + " = ? ";
+                    "." + MovieContract.MovieEntry.COLUMN_TMDB_ID + " = ? ";
 
-    private static final SQLiteQueryBuilder sMoviesBySortSettingQueryBuilder;
+    private static final SQLiteQueryBuilder sMoviesQueryBuilder;
 
     static{
-        sMoviesBySortSettingQueryBuilder = new SQLiteQueryBuilder();
+        sMoviesQueryBuilder = new SQLiteQueryBuilder();
+        sMoviesQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
     }
 
     @Override
@@ -169,7 +170,7 @@ public class MovieProvider extends ContentProvider {
             Uri uri, String[] projection, String sortOrder) {
         long movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
 
-        return sMoviesBySortSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sMoviesQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sMovieIdSelection,
                 new String[]{Long.toString(movieId)},

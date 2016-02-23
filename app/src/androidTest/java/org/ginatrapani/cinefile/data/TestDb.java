@@ -65,6 +65,7 @@ public class TestDb extends AndroidTestCase {
         // Build a HashSet of all of the column names we want to look for
         final HashSet<String> movieColumnsHashSet = new HashSet<String>();
         movieColumnsHashSet.add(MovieContract.MovieEntry._ID);
+        movieColumnsHashSet.add(MovieContract.MovieEntry.COLUMN_TMDB_ID);
         movieColumnsHashSet.add(MovieContract.MovieEntry.COLUMN_TITLE);
         movieColumnsHashSet.add(MovieContract.MovieEntry.COLUMN_OVERVIEW);
         movieColumnsHashSet.add(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
