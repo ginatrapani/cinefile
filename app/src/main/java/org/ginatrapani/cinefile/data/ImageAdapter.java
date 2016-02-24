@@ -1,70 +1,45 @@
 package org.ginatrapani.cinefile.data;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import org.ginatrapani.cinefile.R;
 
 /**
  * Created by ginatrapani on 2/22/16.
  */
-public class ImageAdapter extends BaseAdapter {
-    private Context mContext;
-    // references to our movies
-    private ArrayList<Movie> mMovies = new ArrayList();
+public class ImageAdapter extends CursorAdapter {
 
-    public void clear() {
-        mMovies.clear();
+    public ImageAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
-    public void add(Movie movie) {
-        mMovies.add(movie);
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = LayoutInflater.from(context).inflate(R.layout.grid_item_poster, parent, false);
+        return view;
     }
 
-    public ImageAdapter(Context c) {
-        mContext = c;
-    }
+    /*
+        This is where we fill-in the views with the contents of the cursor.
+     */
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        int idx_poster = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+        String posterPath = cursor.getString(idx_poster);
 
-    public int getCount() {
-        return mMovies.size();
-    }
-
-    public Object getItem(int position) {
-        return mMovies.get(position);
-    }
-
-    public long getItemId(int position) {
-        return mMovies.get(position).getId();
-    }
-
-    public ArrayList<Movie> getMovies() {
-        return mMovies;
-    }
-
-    public void setMovies(ArrayList<Movie> mMovies) {
-        this.mMovies = mMovies;
-    }
-
-    // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
-            // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
-            imageView.setAdjustViewBounds(true);
-            imageView.setPadding(0, 0, 0, 0);
-        } else {
-            imageView = (ImageView) convertView;
-        }
-        Movie movie = mMovies.get(position);
-        Picasso.with(mContext).load(movie.getPosterPath())
-                .resize(movie.getDefaultWidth() * 2, movie.getDefaultHeight() * 2)
+        ImageView imageView = (ImageView)view;
+        imageView.setAdjustViewBounds(true);
+        imageView.setPadding(0, 0, 0, 0);
+        Picasso.with(context).load(Movie.POSTER_DOMAIN_PATH + posterPath)
+                .resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
                 .into(imageView);
-        return imageView;
     }
 }

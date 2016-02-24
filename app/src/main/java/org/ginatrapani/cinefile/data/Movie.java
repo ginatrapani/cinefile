@@ -37,9 +37,9 @@ public class Movie implements Parcelable {
 
     private static final String KEY_POPULARITY = "popularity";
 
-    private final String posterDomainPath = "http://image.tmdb.org/t/p/w185";
-    public final int defaultWidth = 185;
-    public final int defaultHeight = 278;
+    public final static String POSTER_DOMAIN_PATH = "http://image.tmdb.org/t/p/w185";
+    public final static int DEFAULT_WIDTH = 185;
+    public final static int DEFAULT_HEIGHT = 278;
 
     /**
      * This field is needed for Android to be able to
@@ -68,7 +68,7 @@ public class Movie implements Parcelable {
     public Movie(long movieId, String posterPath, String overview, String title, String releaseDate,
                  String voteAverage, String popularity) {
         this.movieId = movieId;
-        this.posterPath = this.posterDomainPath + posterPath;
+        this.posterPath = POSTER_DOMAIN_PATH + posterPath;
         this.overview = overview;
         this.title = title;
         this.releaseDate = releaseDate;
@@ -102,14 +102,6 @@ public class Movie implements Parcelable {
 
     public String getPopularity() {
         return popularity;
-    }
-
-    public int getDefaultWidth() {
-        return defaultWidth;
-    }
-
-    public int getDefaultHeight() {
-        return defaultHeight;
     }
 
     @Override

@@ -2,16 +2,10 @@ package org.ginatrapani.cinefile.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.ginatrapani.cinefile.FavoritesHelper;
-import org.ginatrapani.cinefile.MovieDetailActivityFragment;
 import org.ginatrapani.cinefile.R;
 import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.json.JSONArray;
@@ -29,36 +23,24 @@ import java.util.Vector;
 /**
  * Created by ginatrapani on 2/22/16.
  */
-public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
+public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
-    private ImageAdapter mMoviesAdapter;
     private final Context mContext;
 
-    public FetchMoviesTask(Context context, ImageAdapter moviesAdapter) {
+    public FetchMoviesTask(Context context) {
         mContext = context;
-        mMoviesAdapter = moviesAdapter;
     }
 
     @Override
-    protected Movie[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         String sortOrder = params[0];
-        if (sortOrder.equals("favorites")) {
-            FavoritesHelper favHelper = new FavoritesHelper();
-            long[] favesArray = favHelper.getFavorites(mContext);
-            Movie[] moviesToShow = new Movie[favesArray.length];
-            int i;
-            for(i=0; i < favesArray.length; i++) {
-                moviesToShow[i] = getMovie(favesArray[i]);
-            }
-            return moviesToShow;
-        } else {
-            return getMoviesFromAPI(sortOrder);
-        }
+        getMoviesFromAPI(sortOrder);
+        return null;
     }
 
-    private Movie[] getMoviesFromAPI(String sortOrder) {
+    private void getMoviesFromAPI(String sortOrder) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -93,7 +75,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do
-                return null;
+                return;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -107,12 +89,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return null;
+                return;
             }
             moviesJsonStr = buffer.toString();
             Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
             try {
-                return getMoviesFromJsonStr(moviesJsonStr);
+                getMoviesFromJsonStr(moviesJsonStr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "Error ", e);
             }
@@ -120,7 +102,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the movie data, there's no point in attempting
             // to parse it.
-            return null;
+            return;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -133,32 +115,31 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
                 }
             }
         }
-        return null;
     }
 
-    private Movie getMovie(long movieId) {
-        Cursor movieCursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieUri(movieId),
-                null,
-                null,
-                null,
-                null
-        );
-        if (movieCursor.getCount() > 0) {
-            movieCursor.moveToFirst();
-            return new Movie(
-                    movieCursor.getLong(movieCursor.getColumnIndex(MovieEntry.COLUMN_TMDB_ID)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_TITLE)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE)),
-                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POPULARITY))
-            );
-        } else {
-            return null;
-        }
-    }
+//    private Movie getMovie(long movieId) {
+//        Cursor movieCursor = mContext.getContentResolver().query(
+//                MovieEntry.buildMovieUri(movieId),
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//        if (movieCursor.getCount() > 0) {
+//            movieCursor.moveToFirst();
+//            return new Movie(
+//                    movieCursor.getLong(movieCursor.getColumnIndex(MovieEntry.COLUMN_TMDB_ID)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_TITLE)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE)),
+//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POPULARITY))
+//            );
+//        } else {
+//            return null;
+//        }
+//    }
 
     /**
      * Take the String representing the complete list of movies in JSON Format and
@@ -167,7 +148,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private Movie[] getMoviesFromJsonStr(String moviesJsonStr)
+    private void getMoviesFromJsonStr(String moviesJsonStr)
             throws JSONException {
         final String TMDB_RESULTS = "results";
         final String TMDB_POSTER_PATH = "poster_path";
@@ -207,67 +188,21 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             cVVector.toArray(cvArray);
             mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
         }
-
-        // Sort order:  Ascending, by date.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String sortOrder = prefs.getString(mContext.getString(R.string.pref_key_sort),
-                mContext.getString(R.string.pref_default_sort));
-
-        if (sortOrder.equals("vote_average.desc")) {
-            sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE;
-        } else if (sortOrder.equals("popularity.desc")) {
-            sortOrder = MovieEntry.COLUMN_POPULARITY;
-        }
-        sortOrder += " DESC";
-        Uri moviesUri = MovieEntry.CONTENT_URI;
-
-        // Students: Uncomment the next lines to display what what you stored in the bulkInsert
-        Cursor cur = mContext.getContentResolver().query(moviesUri, null, null, null, sortOrder);
-
-        cVVector = new Vector<ContentValues>(cur.getCount());
-        if ( cur.moveToFirst() ) {
-            do {
-                ContentValues cv = new ContentValues();
-                DatabaseUtils.cursorRowToContentValues(cur, cv);
-                cVVector.add(cv);
-            } while (cur.moveToNext());
-        }
-
-        Log.d(LOG_TAG, "FetchMoviesTask Complete. " + cVVector.size() + " Inserted");
-
-        Movie[] resultMovies = convertContentValuesToMovies(cVVector);
-        return resultMovies;
     }
 
-    private Movie[] convertContentValuesToMovies(Vector<ContentValues> cvv) {
-        Movie[] resultMovies = new Movie[cvv.size()];
-        for ( int i = 0; i < cvv.size(); i++ ) {
-            ContentValues movieValues = cvv.elementAt(i);
-            resultMovies[i] = new Movie(movieValues.getAsInteger(MovieEntry.COLUMN_TMDB_ID),
-                    movieValues.getAsString(MovieEntry.COLUMN_POSTER_PATH),
-                    movieValues.getAsString(MovieEntry.COLUMN_OVERVIEW),
-                    movieValues.getAsString(MovieEntry.COLUMN_TITLE),
-                    movieValues.getAsString(MovieEntry.COLUMN_RELEASE_DATE),
-                    movieValues.getAsString(MovieEntry.COLUMN_VOTE_AVERAGE),
-                    movieValues.getAsString(MovieEntry.COLUMN_POPULARITY)
-                );
-        }
-        return resultMovies;
-    }
-
-    @Override
-    protected void onPostExecute(Movie[] result) {
-        if (result != null) {
-            mMoviesAdapter.clear();
-            for (Movie singleMovie : result) {
-                //Log.v(LOG_TAG, "Adding " + singleMovie + " to adapter");
-                mMoviesAdapter.add(singleMovie);
-            }
-            if (result[0] != null) {
-                ((MovieDetailActivityFragment.Callback) mContext).onMovieListLoaded(result[0]);
-            }
-
-            mMoviesAdapter.notifyDataSetChanged();
-        }
-    }
+//    private Movie[] convertContentValuesToMovies(Vector<ContentValues> cvv) {
+//        Movie[] resultMovies = new Movie[cvv.size()];
+//        for ( int i = 0; i < cvv.size(); i++ ) {
+//            ContentValues movieValues = cvv.elementAt(i);
+//            resultMovies[i] = new Movie(movieValues.getAsInteger(MovieEntry.COLUMN_TMDB_ID),
+//                    movieValues.getAsString(MovieEntry.COLUMN_POSTER_PATH),
+//                    movieValues.getAsString(MovieEntry.COLUMN_OVERVIEW),
+//                    movieValues.getAsString(MovieEntry.COLUMN_TITLE),
+//                    movieValues.getAsString(MovieEntry.COLUMN_RELEASE_DATE),
+//                    movieValues.getAsString(MovieEntry.COLUMN_VOTE_AVERAGE),
+//                    movieValues.getAsString(MovieEntry.COLUMN_POPULARITY)
+//                );
+//        }
+//        return resultMovies;
+//    }
 }

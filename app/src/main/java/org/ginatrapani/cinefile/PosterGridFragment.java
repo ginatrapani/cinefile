@@ -1,6 +1,8 @@
 package org.ginatrapani.cinefile;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -10,12 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.ginatrapani.cinefile.data.FetchMoviesTask;
 import org.ginatrapani.cinefile.data.ImageAdapter;
 import org.ginatrapani.cinefile.data.Movie;
+import org.ginatrapani.cinefile.data.MovieContract;
 
 import java.util.ArrayList;
 
@@ -50,35 +52,43 @@ public class PosterGridFragment extends Fragment {
             mMovies = savedInstanceState.getParcelableArrayList(KEY_MOVIE_LIST);
         }
 
+        // Sort order:  vote_average.desc, popularity.desc, or favorites.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getActivity().getString(R.string.pref_key_sort),
+                getActivity().getString(R.string.pref_default_sort));
+
+        if (sortOrder.equals("vote_average.desc")) {
+            sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE;
+        } else if (sortOrder.equals("popularity.desc")) {
+            sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY;
+        } else if (sortOrder.equals("favorites")) {
+            // @TODO Do the join on the future favorites table
+            sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY; //
+        }
+        sortOrder += " DESC";
+        Uri moviesUri = MovieContract.MovieEntry.CONTENT_URI;
+
+        // Students: Uncomment the next lines to display what what you stored in the bulkInsert
+        Cursor cur = getActivity().getContentResolver().query(moviesUri, null, null, null,
+                sortOrder);
+
         View rootView = inflater.inflate(R.layout.fragment_poster_grid, container, false);
+        GridView gridView = (GridView) rootView.findViewById(R.id.gridview);
+        mMoviesAdapter = new ImageAdapter(this.getActivity(), cur, 0);
+        gridView.setAdapter(mMoviesAdapter);
 
-        GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
-        mMoviesAdapter = new ImageAdapter(this.getActivity());
-        gridview.setAdapter(mMoviesAdapter);
-
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Movie clickedMovie = (Movie) mMoviesAdapter.getItem(position);
-
-                ((MovieDetailActivityFragment.Callback) getActivity())
-                        .setMovie(clickedMovie);
-                ((MovieDetailActivityFragment.Callback) getActivity())
-                        .onItemSelected();
-            }
-        });
         return rootView;
     }
 
     private void updateMovies() {
-        if (mMovies != null) {
-            mMoviesAdapter.setMovies(mMovies);
-        } else {
+//        if (mMovies != null) {
+//            mMoviesAdapter.setMovies(mMovies);
+//        } else {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
                     getString(R.string.pref_default_sort));
-            new FetchMoviesTask(getActivity(), mMoviesAdapter ).execute(sortOrder);
-        }
+            new FetchMoviesTask(getActivity()).execute(sortOrder);
+//        }
     }
 
     @Override
@@ -95,13 +105,12 @@ public class PosterGridFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks
-        int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(KEY_MOVIE_LIST, mMoviesAdapter.getMovies());
+        //outState.putParcelableArrayList(KEY_MOVIE_LIST, mMoviesAdapter.getMovies());
         super.onSaveInstanceState(outState);
     }
 }
