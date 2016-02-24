@@ -1,5 +1,6 @@
 package org.ginatrapani.cinefile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.ginatrapani.cinefile.data.MovieContract;
@@ -62,15 +64,23 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         mMoviesAdapter = new ImageAdapter(this.getActivity(), null, 0);
         gridView.setAdapter(mMoviesAdapter);
 
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
+                        .setData(MovieContract.MovieEntry.buildMovieUri(cursor.getInt(COL_TMDB_ID)
+                        ));
+                    startActivity(intent);
+                }
+            }
+        });
         return rootView;
     }
-
-//    private void updateMovies() {
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-//                getString(R.string.pref_default_sort));
-//        new FetchMoviesTask(getActivity()).execute(sortOrder);
-//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -82,12 +92,6 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     public void onDetach() {
         super.onDetach();
     }
-
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        //updateMovies();
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -3,10 +3,14 @@ package org.ginatrapani.cinefile;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +26,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import org.ginatrapani.cinefile.data.Movie;
+import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,8 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-
-public class MovieDetailActivityFragment extends Fragment {
+public class MovieDetailActivityFragment extends Fragment implements LoaderCallbacks<Cursor>  {
 
     static final String MOVIE = "MOVIE";
 
@@ -47,32 +51,41 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private ReviewAdapter mReviewAdapter;
 
-    private Movie mMovie;
+    private String movieId;
+
+    private static final int DETAIL_LOADER = 0;
+
+    private static final String[] MOVIE_COLUMNS = {
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_OVERVIEW,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_TMDB_ID
+    };
+
+    // these constants correspond to the projection defined above, and must change if the
+    // projection changes
+    private static final int COL_MOVIE_TITLE = 0;
+    private static final int COL_MOVIE_OVERVIEW = 1;
+    private static final int COL_MOVIE_RELEASE_DATE = 2;
+    private static final int COL_MOVIE_VOTE_AVERAGE = 3;
+    private static final int COL_MOVIE_POSTER_PATH = 4;
+    private static final int COL_MOVIE_TMDB_ID = 5;
+
 
     public MovieDetailActivityFragment() {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // The detail Activity called via intent.  Inspect the intent for movie data.
-        Intent intent = getActivity().getIntent();
-
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            mMovie = arguments.getParcelable(MOVIE);
-            //Log.v(LOG_TAG, "Found movie in arguments");
-        } else if (intent != null && intent.hasExtra(MOVIE)) {
-            mMovie = intent.getParcelableExtra(MOVIE);
-            //Log.v(LOG_TAG, "Found movie in intent");
-        }
-
-        if (mMovie == null && savedInstanceState != null) {
-            // read the movie list from the saved state
-            mMovie = savedInstanceState.getParcelable(MOVIE);
-            //Log.v(LOG_TAG, "Found movie in savedInstanceState");
-        }
-
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -86,78 +99,111 @@ public class MovieDetailActivityFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         ListView reviewListView = (ListView) rootView.findViewById(R.id.listview_review);
         reviewListView.setAdapter(mReviewAdapter);
-
-        if (mMovie != null) {
-            //Log.v(LOG_TAG, "Overview string is " + mMovie.getOverview());
-            ((TextView) rootView.findViewById(R.id.detail_text))
-                    .setText(mMovie.getOverview());
-            ((TextView) rootView.findViewById(R.id.movie_title))
-                    .setText(mMovie.getTitle());
-            SimpleDateFormat apiReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat friendlyReleaseDateFormat = new SimpleDateFormat("MMMM d, yyyy");
-
-            String reformattedReleaseDateStr = mMovie.getReleaseDate();
-            try {
-                reformattedReleaseDateStr = friendlyReleaseDateFormat
-                        .format(apiReleaseDate.parse(mMovie.getReleaseDate()));
-            } catch (ParseException e) {
-                //do nothing, default to what API returned
-            }
-            ((TextView) rootView.findViewById(R.id.movie_release))
-                    .setText(reformattedReleaseDateStr);
-
-            String voteAverageString = mMovie.getVoteAverage()
-                    + " " + getResources().getString(R.string.vote_average_suffix);
-            ((TextView) rootView.findViewById(R.id.vote_average))
-                    .setText(voteAverageString);
-            ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(getActivity()).load(mMovie.getPosterPath()).
-                    resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
-                    .into(imageView);
-
-            trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    Trailer trailer = mTrailerAdapter.getItem(position);
-                    Uri builtUri = Uri.parse("https://www.youtube.com/watch?v=" + trailer.getKey()).
-                            buildUpon().build();
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(builtUri);
-                    startActivity(intent);
-                }
-            });
-
-            ImageButton faveButton = (ImageButton) rootView.findViewById(R.id.button_favorite);
-
-            FavoritesHelper favHelper = new FavoritesHelper();
-            if (favHelper.isFavorite(getActivity(), mMovie.getId())) {
-                faveButton.setImageResource(android.R.drawable.btn_star_big_on);
-            }
-            faveButton.setVisibility(View.VISIBLE);
-            faveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mMovie != null) {
-                        FavoritesHelper favHelper = new FavoritesHelper();
-                        if (favHelper.isFavorite(getActivity(), mMovie.getId())) {
-                            favHelper.unFavorite(v.getContext(), mMovie.getId());
-
-                            ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_off);
-                            Toast.makeText(v.getContext(), "You unfavorited " + mMovie.getTitle()
-                                    + ".", Toast.LENGTH_LONG).show();
-                        } else {
-                            favHelper.saveFavorite(v.getContext(), mMovie.getId());
-
-                            ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
-                            Toast.makeText(v.getContext(), "You favorited " + mMovie.getTitle()
-                                    + ".", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }
-            });
-        }
         return rootView;
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In onCreateLoader");
+        Intent intent = getActivity().getIntent();
+        if (intent == null) {
+            return null;
+        }
+
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+            getActivity(),
+            intent.getData(),
+            MOVIE_COLUMNS,
+            null,
+            null,
+            null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, "In onLoadFinished");
+        if (!data.moveToFirst()) { return; }
+
+        movieId = data.getString(COL_MOVIE_TMDB_ID);
+
+        if (movieId != null) {
+            updateTrailers(Long.valueOf(movieId).longValue());
+            updateReviews(Long.valueOf(movieId).longValue());
+        }
+
+        ((TextView) getView().findViewById(R.id.detail_text))
+                .setText(data.getString(COL_MOVIE_OVERVIEW));
+        ((TextView) getView().findViewById(R.id.movie_title))
+                .setText(data.getString(COL_MOVIE_TITLE));
+        SimpleDateFormat apiReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat friendlyReleaseDateFormat = new SimpleDateFormat("MMMM d, yyyy");
+
+        String reformattedReleaseDateStr = data.getString(COL_MOVIE_RELEASE_DATE);
+        try {
+            reformattedReleaseDateStr = friendlyReleaseDateFormat
+                    .format(apiReleaseDate.parse(data.getString(COL_MOVIE_RELEASE_DATE)));
+        } catch (ParseException e) {
+            //do nothing, default to what API returned
+        }
+        ((TextView) getView().findViewById(R.id.movie_release))
+                .setText(reformattedReleaseDateStr);
+
+        String voteAverageString = data.getString(COL_MOVIE_VOTE_AVERAGE)
+                + " " + getResources().getString(R.string.vote_average_suffix);
+        ((TextView) getView().findViewById(R.id.vote_average))
+                .setText(voteAverageString);
+        ImageView imageView = (ImageView) getView().findViewById(R.id.movie_poster);
+        Picasso.with(getActivity()).load(
+                Movie.POSTER_DOMAIN_PATH + data.getString(COL_MOVIE_POSTER_PATH)).
+                resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
+                .into(imageView);
+
+        ListView trailerListView = (ListView) getView().findViewById(R.id.listview_trailer);
+        trailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Trailer trailer = mTrailerAdapter.getItem(position);
+                Uri builtUri = Uri.parse("https://www.youtube.com/watch?v=" + trailer.getKey()).
+                        buildUpon().build();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(builtUri);
+                startActivity(intent);
+            }
+        });
+
+        ImageButton faveButton = (ImageButton) getView().findViewById(R.id.button_favorite);
+
+        FavoritesHelper favHelper = new FavoritesHelper();
+        if (favHelper.isFavorite(getActivity(), data.getLong(COL_MOVIE_TMDB_ID))) {
+            faveButton.setImageResource(android.R.drawable.btn_star_big_on);
+        }
+        faveButton.setVisibility(View.VISIBLE);
+        faveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (movieId != null) {
+                    FavoritesHelper favHelper = new FavoritesHelper();
+                    if (favHelper.isFavorite(getActivity(), Long.valueOf(movieId).longValue())) {
+                        favHelper.unFavorite(v.getContext(), Long.valueOf(movieId).longValue());
+
+                        ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_off);
+                        Toast.makeText(v.getContext(), "Unfavorited!", Toast.LENGTH_LONG).show();
+                    } else {
+                        favHelper.saveFavorite(v.getContext(), Long.valueOf(movieId).longValue());
+
+                        ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
+                        Toast.makeText(v.getContext(), "Favorited! ", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) { }
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -178,17 +224,6 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (mMovie != null) {
-            updateTrailers(mMovie.getId());
-            updateReviews(mMovie.getId());
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        //Log.v(LOG_TAG, "About to save the current movie to outstate");
-        outState.putParcelable(MOVIE, mMovie);
-        super.onSaveInstanceState(outState);
     }
 
     private void updateTrailers(long movieId) {
