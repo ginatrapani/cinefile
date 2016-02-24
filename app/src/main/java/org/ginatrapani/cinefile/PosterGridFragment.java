@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import org.ginatrapani.cinefile.data.FetchMoviesTask;
 import org.ginatrapani.cinefile.data.MovieContract;
 
 public class PosterGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -66,12 +65,12 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         return rootView;
     }
 
-    private void updateMovies() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-                getString(R.string.pref_default_sort));
-        new FetchMoviesTask(getActivity()).execute(sortOrder);
-    }
+//    private void updateMovies() {
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+//                getString(R.string.pref_default_sort));
+//        new FetchMoviesTask(getActivity()).execute(sortOrder);
+//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -84,11 +83,11 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         super.onDetach();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovies();
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        //updateMovies();
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
