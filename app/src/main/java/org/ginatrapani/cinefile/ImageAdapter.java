@@ -1,4 +1,4 @@
-package org.ginatrapani.cinefile.data;
+package org.ginatrapani.cinefile;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import org.ginatrapani.cinefile.R;
+import org.ginatrapani.cinefile.data.Movie;
 
 /**
  * Created by ginatrapani on 2/22/16.
@@ -32,14 +32,13 @@ public class ImageAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        int idx_poster = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
-        String posterPath = cursor.getString(idx_poster);
 
         ImageView imageView = (ImageView)view;
         imageView.setAdjustViewBounds(true);
         imageView.setPadding(0, 0, 0, 0);
-        Picasso.with(context).load(Movie.POSTER_DOMAIN_PATH + posterPath)
-                .resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
+        Picasso.with(context).load(
+                Movie.POSTER_DOMAIN_PATH + cursor.getString(PosterGridFragment.COL_POSTER_PATH
+                )).resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
                 .into(imageView);
     }
 }

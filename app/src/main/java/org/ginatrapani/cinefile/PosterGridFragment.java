@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import org.ginatrapani.cinefile.data.FetchMoviesTask;
-import org.ginatrapani.cinefile.data.ImageAdapter;
 import org.ginatrapani.cinefile.data.MovieContract;
 
 public class PosterGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -26,6 +25,20 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     public static ImageAdapter mMoviesAdapter;
 
     private static final int MOVIES_LOADER = 0;
+
+    // For the grid view we're showing only a small subset of the stored data.
+    // Specify the columns we need.
+    private static final String[] MOVIE_COLUMNS = {
+            MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_TMDB_ID,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+    };
+
+    // These indices are tied to MOVIE_COLUMNS.  If MOVIE_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_TMDB_ID = 1;
+    static final int COL_POSTER_PATH = 2;
 
     public PosterGridFragment() {
     }
@@ -103,7 +116,7 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
 
         return new CursorLoader(getActivity(),
                 moviesUri,
-                null,
+                MOVIE_COLUMNS,
                 null,
                 null,
                 sortOrder);
