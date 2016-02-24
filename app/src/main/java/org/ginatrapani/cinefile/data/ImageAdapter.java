@@ -28,7 +28,7 @@ public class ImageAdapter extends CursorAdapter {
     }
 
     /*
-        This is where we fill-in the views with the contents of the cursor.
+        Fill in the view with the contents of the cursor.
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {

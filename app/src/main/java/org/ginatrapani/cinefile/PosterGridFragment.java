@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,23 +16,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.support.v4.content.CursorLoader;
+
 import org.ginatrapani.cinefile.data.FetchMoviesTask;
 import org.ginatrapani.cinefile.data.ImageAdapter;
-import org.ginatrapani.cinefile.data.Movie;
 import org.ginatrapani.cinefile.data.MovieContract;
-
-import java.util.ArrayList;
 
 public class PosterGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static ImageAdapter mMoviesAdapter;
 
-    private static final String KEY_MOVIE_LIST = "movies";
-
     private static final int MOVIES_LOADER = 0;
-
-    private ArrayList<Movie> mMovies;
 
     public PosterGridFragment() {
     }
@@ -51,11 +45,6 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            // read the movie list from the saved state
-            mMovies = savedInstanceState.getParcelableArrayList(KEY_MOVIE_LIST);
-        }
-
         View rootView = inflater.inflate(R.layout.fragment_poster_grid, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview);
         mMoviesAdapter = new ImageAdapter(this.getActivity(), null, 0);
@@ -65,14 +54,10 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     }
 
     private void updateMovies() {
-//        if (mMovies != null) {
-//            mMoviesAdapter.setMovies(mMovies);
-//        } else {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-                    getString(R.string.pref_default_sort));
-            new FetchMoviesTask(getActivity()).execute(sortOrder);
-//        }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                getString(R.string.pref_default_sort));
+        new FetchMoviesTask(getActivity()).execute(sortOrder);
     }
 
     @Override
@@ -98,11 +83,6 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        //outState.putParcelableArrayList(KEY_MOVIE_LIST, mMoviesAdapter.getMovies());
-        super.onSaveInstanceState(outState);
-    }
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Sort order:  vote_average.desc, popularity.desc, or favorites.

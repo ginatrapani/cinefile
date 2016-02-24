@@ -44,9 +44,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
-        // Raw JSON response as a string
-        String moviesJsonStr = null;
-
         try {
             // Construct the URL for the TheMovieDB query
             final String MOVIE_BASE_URL =
@@ -91,7 +88,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
                 // Stream was empty.  No point in parsing.
                 return;
             }
-            moviesJsonStr = buffer.toString();
+            String moviesJsonStr = buffer.toString();
             Log.v(LOG_TAG, "Movies JSON " + moviesJsonStr);
             try {
                 getMoviesFromJsonStr(moviesJsonStr);
@@ -116,30 +113,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
             }
         }
     }
-
-//    private Movie getMovie(long movieId) {
-//        Cursor movieCursor = mContext.getContentResolver().query(
-//                MovieEntry.buildMovieUri(movieId),
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        if (movieCursor.getCount() > 0) {
-//            movieCursor.moveToFirst();
-//            return new Movie(
-//                    movieCursor.getLong(movieCursor.getColumnIndex(MovieEntry.COLUMN_TMDB_ID)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_TITLE)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE)),
-//                    movieCursor.getString(movieCursor.getColumnIndex(MovieEntry.COLUMN_POPULARITY))
-//            );
-//        } else {
-//            return null;
-//        }
-//    }
 
     /**
      * Take the String representing the complete list of movies in JSON Format and
@@ -189,20 +162,4 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
             mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
         }
     }
-
-//    private Movie[] convertContentValuesToMovies(Vector<ContentValues> cvv) {
-//        Movie[] resultMovies = new Movie[cvv.size()];
-//        for ( int i = 0; i < cvv.size(); i++ ) {
-//            ContentValues movieValues = cvv.elementAt(i);
-//            resultMovies[i] = new Movie(movieValues.getAsInteger(MovieEntry.COLUMN_TMDB_ID),
-//                    movieValues.getAsString(MovieEntry.COLUMN_POSTER_PATH),
-//                    movieValues.getAsString(MovieEntry.COLUMN_OVERVIEW),
-//                    movieValues.getAsString(MovieEntry.COLUMN_TITLE),
-//                    movieValues.getAsString(MovieEntry.COLUMN_RELEASE_DATE),
-//                    movieValues.getAsString(MovieEntry.COLUMN_VOTE_AVERAGE),
-//                    movieValues.getAsString(MovieEntry.COLUMN_POPULARITY)
-//                );
-//        }
-//        return resultMovies;
-//    }
 }
