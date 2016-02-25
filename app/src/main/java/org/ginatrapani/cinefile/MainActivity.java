@@ -1,11 +1,15 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.ginatrapani.cinefile.data.FetchMoviesTask;
 
 public class MainActivity extends AppCompatActivity implements MovieDetailActivityFragment.Callback {
 
@@ -60,9 +64,18 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
+        } else if ( id == R.id.action_refresh) {
+            updateMovies();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateMovies() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                getString(R.string.pref_default_sort));
+        new FetchMoviesTask(this).execute(sortOrder);
     }
 
     @Override

@@ -135,16 +135,8 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         mMoviesAdapter.swapCursor(null);
     }
 
-    private void updateMovies() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-                getString(R.string.pref_default_sort));
-        new FetchMoviesTask(getActivity()).execute(sortOrder);
-    }
-
     @Override
     public void onStart() {
         super.onStart();
-        updateMovies();
     }
 }
