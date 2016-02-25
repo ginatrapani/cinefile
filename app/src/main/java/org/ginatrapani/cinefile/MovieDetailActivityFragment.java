@@ -42,15 +42,17 @@ import java.util.ArrayList;
 
 public class MovieDetailActivityFragment extends Fragment implements LoaderCallbacks<Cursor>  {
 
-    static final String MOVIE = "MOVIE";
-
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
+
+    static final String DETAIL_URI = "URI";
 
     private TrailerAdapter mTrailerAdapter;
 
     private ReviewAdapter mReviewAdapter;
 
-    private String movieId;
+    private String mMovieId;
+
+    private Uri mUri;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -85,6 +87,11 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+         if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailActivityFragment.DETAIL_URI);
+        }
+
         mTrailerAdapter = new TrailerAdapter(this.getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
@@ -104,21 +111,19 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
+        if ( null != mUri ) {
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(
+                getActivity(),
+                mUri,
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null
+            );
         }
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-            getActivity(),
-            intent.getData(),
-            MOVIE_COLUMNS,
-            null,
-            null,
-            null
-        );
+        return null;
     }
 
     @Override
@@ -126,11 +131,12 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
         Log.v(LOG_TAG, "In onLoadFinished");
         if (!data.moveToFirst()) { return; }
 
-        movieId = data.getString(COL_MOVIE_TMDB_ID);
+        Log.v(LOG_TAG, "There's a movie to display");
+        mMovieId = data.getString(COL_MOVIE_TMDB_ID);
 
-        if (movieId != null) {
-            updateTrailers(Long.valueOf(movieId).longValue());
-            updateReviews(Long.valueOf(movieId).longValue());
+        if (mMovieId != null) {
+            updateTrailers(Long.valueOf(mMovieId).longValue());
+            updateReviews(Long.valueOf(mMovieId).longValue());
         }
 
         ((TextView) getView().findViewById(R.id.detail_text))
@@ -183,15 +189,15 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
         faveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (movieId != null) {
+                if (mMovieId != null) {
                     FavoritesHelper favHelper = new FavoritesHelper();
-                    if (favHelper.isFavorite(getActivity(), Long.valueOf(movieId).longValue())) {
-                        favHelper.unFavorite(v.getContext(), Long.valueOf(movieId).longValue());
+                    if (favHelper.isFavorite(getActivity(), Long.valueOf(mMovieId).longValue())) {
+                        favHelper.unFavorite(v.getContext(), Long.valueOf(mMovieId).longValue());
 
                         ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_off);
                         Toast.makeText(v.getContext(), "Unfavorited!", Toast.LENGTH_LONG).show();
                     } else {
-                        favHelper.saveFavorite(v.getContext(), Long.valueOf(movieId).longValue());
+                        favHelper.saveFavorite(v.getContext(), Long.valueOf(mMovieId).longValue());
 
                         ((ImageButton) v).setImageResource(android.R.drawable.btn_star_big_on);
                         Toast.makeText(v.getContext(), "Favorited! ", Toast.LENGTH_LONG).show();
@@ -204,33 +210,12 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
     @Override
     public void onLoaderReset(Loader<Cursor> loader) { }
 
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        public void onItemSelected();
-
-        public void onMovieListLoaded(Uri firstMovieUri);
-
-        public void setMovieUri(Uri movieUri);
+    private void updateTrailers(long mMovieId) {
+        new FetchTrailersTask().execute(new Long(mMovieId).toString());
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    private void updateTrailers(long movieId) {
-        new FetchTrailersTask().execute(new Long(movieId).toString());
-    }
-
-    private void updateReviews(long movieId) {
-        new FetchReviewsTask().execute(new Long(movieId).toString());
+    private void updateReviews(long mMovieId) {
+        new FetchReviewsTask().execute(new Long(mMovieId).toString());
     }
 
     public class FetchTrailersTask extends AsyncTask<String, Void, Trailer[]> {

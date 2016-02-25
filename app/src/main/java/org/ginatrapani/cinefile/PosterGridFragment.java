@@ -1,6 +1,5 @@
 package org.ginatrapani.cinefile;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import org.ginatrapani.cinefile.data.FetchMoviesTask;
 import org.ginatrapani.cinefile.data.MovieContract;
 
 public class PosterGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -39,6 +37,18 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     static final int COL_MOVIE_ID = 0;
     static final int COL_TMDB_ID = 1;
     static final int COL_POSTER_PATH = 2;
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * MovieDetailActivityFragment Callback for when an item has been selected.
+         */
+        void onItemSelected(Uri movieUri);
+    }
 
     public PosterGridFragment() {
     }
@@ -71,10 +81,11 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
-                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-                            .setData(MovieContract.MovieEntry.buildMovieUri(cursor.getInt(COL_TMDB_ID)
-                            ));
-                    startActivity(intent);
+                    ((Callback) getActivity())
+                        .onItemSelected(
+                            MovieContract.MovieEntry.buildMovieUri(cursor.getInt(COL_TMDB_ID)
+                        )
+                    );
                 }
             }
         });

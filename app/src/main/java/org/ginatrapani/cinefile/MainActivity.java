@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.ginatrapani.cinefile.data.FetchMoviesTask;
 
-public class MainActivity extends AppCompatActivity implements MovieDetailActivityFragment.Callback {
+public class MainActivity extends AppCompatActivity implements PosterGridFragment.Callback {
 
     private boolean mTwoPane;
 
@@ -25,17 +26,12 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "In onCreate");
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
 
         mApiSortOrder = Utility.getAPISortOrder(this);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_poster_grid, new PosterGridFragment(),
-                POSTER_GRID_FRAGMENT_TAG).commit();
-        }
+        setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.movie_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
@@ -50,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                         .replace(R.id.movie_detail_container, new MovieDetailActivityFragment(),
                                 DETAIL_FRAGMENT_TAG).commit();
             }
-            (this).onItemSelected();
         } else {
             mTwoPane = false;
         }
@@ -74,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
+        //@TODO Delete this once updates happen automatically
         } else if ( id == R.id.action_refresh) {
             updateMovies();
         }
@@ -81,44 +77,21 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
         return super.onOptionsItemSelected(item);
     }
 
+    //@TODO Delete this once updates happen automatically
     private void updateMovies() {
         new FetchMoviesTask(this).execute();
     }
 
     @Override
-    public void setMovieUri(Uri movieUri) {
-        mMovieUri = movieUri;
-    }
-
-    @Override
-    public void onMovieListLoaded(Uri firstMovieUri) {
-        //Log.v(LOG_TAG, "onMovieListLoaded called");
+    public void onItemSelected(Uri contentUri) {
+        Log.v(LOG_TAG, "onItemSelected called");
         if (mTwoPane) {
-            //Log.v(LOG_TAG, "In a 2-pane layout");
-            setMovieUri(firstMovieUri);
+            Log.v(LOG_TAG, "In a 2-pane layout");
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-
-            MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
-                    .commit();
-        }
-    }
-
-    @Override
-    public void onItemSelected() {
-        //Log.v(LOG_TAG, "onItemSelected called");
-        if (mTwoPane) {
-            //Log.v(LOG_TAG, "In a 2-pane layout");
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle args = new Bundle();
+            args.putParcelable(MovieDetailActivityFragment.DETAIL_URI, contentUri);
 
             MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
             fragment.setArguments(args);
@@ -127,20 +100,19 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
-            //Log.v(LOG_TAG, "In a single pane layout");
-            if (mMovieUri != null) {
-                //Log.v(LOG_TAG, "There's a movie to show");
-                Intent intent = new Intent(this, MovieDetailActivity.class).setData(mMovieUri);
-                startActivity(intent);
-            }
+            Log.v(LOG_TAG, "In a single pane layout");
+            Intent intent = new Intent(this, MovieDetailActivity.class)
+                    .setData(contentUri);
+            startActivity(intent);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v(LOG_TAG, "In onResume");
         String apiSortOrder = Utility.getAPISortOrder(this);
-        // update the location in our second pane using the fragment manager
+        // update the sort order in the grid fragment if it changed
         if (apiSortOrder != null && !apiSortOrder.equals(mApiSortOrder)) {
             PosterGridFragment ff = (PosterGridFragment)getSupportFragmentManager().
                     findFragmentByTag(POSTER_GRID_FRAGMENT_TAG);
