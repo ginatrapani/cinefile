@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import org.ginatrapani.cinefile.data.Movie;
+import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 
 /**
  * Created by ginatrapani on 2/22/16.
@@ -37,8 +37,8 @@ public class ImageAdapter extends CursorAdapter {
         imageView.setAdjustViewBounds(true);
         imageView.setPadding(0, 0, 0, 0);
         Picasso.with(context).load(
-                Movie.POSTER_DOMAIN_PATH + cursor.getString(PosterGridFragment.COL_POSTER_PATH
-                )).resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
+                MovieEntry.POSTER_DOMAIN_PATH + cursor.getString(PosterGridFragment.COL_POSTER_PATH
+                )).resize(MovieEntry.DEFAULT_WIDTH * 2, MovieEntry.DEFAULT_HEIGHT * 2)
                 .into(imageView);
     }
 }

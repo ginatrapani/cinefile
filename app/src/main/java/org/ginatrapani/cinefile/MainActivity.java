@@ -1,12 +1,11 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import org.ginatrapani.cinefile.data.Movie;
-
 
 public class MainActivity extends AppCompatActivity implements MovieDetailActivityFragment.Callback {
 
@@ -16,16 +15,12 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private Movie mMovie;
+    private Uri mMovieUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState != null) {
-            // read the movie list from the saved state
-            mMovie = savedInstanceState.getParcelable(MovieDetailActivityFragment.MOVIE);
-        }
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.movie_detail_container) != null) {
@@ -41,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                         .replace(R.id.movie_detail_container, new MovieDetailActivityFragment(),
                                 DETAILFRAGMENT_TAG).commit();
             }
-            ((MovieDetailActivityFragment.Callback) this).onItemSelected();
+            (this).onItemSelected();
         } else {
             mTwoPane = false;
         }
@@ -71,21 +66,20 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     }
 
     @Override
-    public void setMovie(Movie movie) {
-        mMovie = movie;
+    public void setMovieUri(Uri movieUri) {
+        mMovieUri = movieUri;
     }
 
     @Override
-    public void onMovieListLoaded(Movie firstMovie) {
+    public void onMovieListLoaded(Uri firstMovieUri) {
         //Log.v(LOG_TAG, "onMovieListLoaded called");
         if (mTwoPane) {
             //Log.v(LOG_TAG, "In a 2-pane layout");
-            setMovie(firstMovie);
+            setMovieUri(firstMovieUri);
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-            args.putParcelable(MovieDetailActivityFragment.MOVIE, firstMovie);
 
             MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
             fragment.setArguments(args);
@@ -105,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle args = new Bundle();
-            args.putParcelable(MovieDetailActivityFragment.MOVIE, mMovie);
 
             MovieDetailActivityFragment fragment = new MovieDetailActivityFragment();
             fragment.setArguments(args);
@@ -115,21 +108,11 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                     .commit();
         } else {
             //Log.v(LOG_TAG, "In a single pane layout");
-            if (mMovie != null) {
+            if (mMovieUri != null) {
                 //Log.v(LOG_TAG, "There's a movie to show");
-                Intent intent = new Intent(this, MovieDetailActivity.class)
-                        .putExtra(MovieDetailActivityFragment.MOVIE, mMovie);
+                Intent intent = new Intent(this, MovieDetailActivity.class).setData(mMovieUri);
                 startActivity(intent);
             }
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mMovie != null) {
-            //Log.v(LOG_TAG, "Saving movie to outstate");
-            outState.putParcelable(MovieDetailActivityFragment.MOVIE, mMovie);
-        }
-        super.onSaveInstanceState(outState);
     }
 }

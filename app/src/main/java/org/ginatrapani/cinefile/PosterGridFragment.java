@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import org.ginatrapani.cinefile.data.FetchMoviesTask;
 import org.ginatrapani.cinefile.data.MovieContract;
 
 public class PosterGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -132,5 +133,18 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mMoviesAdapter.swapCursor(null);
+    }
+
+    private void updateMovies() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
+                getString(R.string.pref_default_sort));
+        new FetchMoviesTask(getActivity()).execute(sortOrder);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateMovies();
     }
 }

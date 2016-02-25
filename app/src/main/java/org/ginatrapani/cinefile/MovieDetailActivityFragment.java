@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import org.ginatrapani.cinefile.data.Movie;
 import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -157,8 +156,8 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
                 .setText(voteAverageString);
         ImageView imageView = (ImageView) getView().findViewById(R.id.movie_poster);
         Picasso.with(getActivity()).load(
-                Movie.POSTER_DOMAIN_PATH + data.getString(COL_MOVIE_POSTER_PATH)).
-                resize(Movie.DEFAULT_WIDTH * 2, Movie.DEFAULT_HEIGHT * 2)
+                MovieEntry.POSTER_DOMAIN_PATH + data.getString(COL_MOVIE_POSTER_PATH)).
+                resize(MovieEntry.DEFAULT_WIDTH * 2, MovieEntry.DEFAULT_HEIGHT * 2)
                 .into(imageView);
 
         ListView trailerListView = (ListView) getView().findViewById(R.id.listview_trailer);
@@ -216,9 +215,9 @@ public class MovieDetailActivityFragment extends Fragment implements LoaderCallb
          */
         public void onItemSelected();
 
-        public void onMovieListLoaded(Movie firstMovie);
+        public void onMovieListLoaded(Uri firstMovieUri);
 
-        public void setMovie(Movie movie);
+        public void setMovieUri(Uri movieUri);
     }
 
     @Override

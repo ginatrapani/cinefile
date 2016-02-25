@@ -48,6 +48,10 @@ public class MovieContract {
 
         public static final String COLUMN_TMDB_ID = "tmdb_id";
 
+        public final static String POSTER_DOMAIN_PATH = "http://image.tmdb.org/t/p/w185";
+        public final static int DEFAULT_WIDTH = 185;
+        public final static int DEFAULT_HEIGHT = 278;
+
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
