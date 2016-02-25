@@ -1,11 +1,9 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -74,8 +72,8 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     Intent intent = new Intent(getActivity(), MovieDetailActivity.class)
-                        .setData(MovieContract.MovieEntry.buildMovieUri(cursor.getInt(COL_TMDB_ID)
-                        ));
+                            .setData(MovieContract.MovieEntry.buildMovieUri(cursor.getInt(COL_TMDB_ID)
+                            ));
                     startActivity(intent);
                 }
             }
@@ -90,11 +88,6 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks
         return super.onOptionsItemSelected(item);
@@ -102,19 +95,8 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Sort order:  vote_average.desc, popularity.desc, or favorites.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortOrder = prefs.getString(getActivity().getString(R.string.pref_key_sort),
-                getActivity().getString(R.string.pref_default_sort));
+        String sortOrder = Utility.getDBSortOrder(getActivity());
 
-        if (sortOrder.equals("vote_average.desc")) {
-            sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE;
-        } else if (sortOrder.equals("popularity.desc")) {
-            sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY;
-        } else if (sortOrder.equals("favorites")) {
-            // @TODO Do the join on the future favorites table
-            sortOrder = MovieContract.MovieEntry.COLUMN_POPULARITY; //
-        }
         sortOrder += " DESC";
         Uri moviesUri = MovieContract.MovieEntry.CONTENT_URI;
 
@@ -135,8 +117,7 @@ public class PosterGridFragment extends Fragment implements LoaderManager.Loader
         mMoviesAdapter.swapCursor(null);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    public void onSortChanged() {
+        getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
     }
 }

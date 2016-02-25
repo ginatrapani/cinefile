@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.ginatrapani.cinefile.R;
+import org.ginatrapani.cinefile.Utility;
 import org.ginatrapani.cinefile.data.MovieContract.MovieEntry;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,12 +36,13 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-        String sortOrder = params[0];
-        getMoviesFromAPI(sortOrder);
+        getMoviesFromAPI();
         return null;
     }
 
-    private void getMoviesFromAPI(String sortOrder) {
+    private void getMoviesFromAPI() {
+        Log.v(LOG_TAG, "Getting movies from API");
+        String sortOrder = Utility.getAPISortOrder(mContext);
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 

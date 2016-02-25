@@ -1,10 +1,8 @@
 package org.ginatrapani.cinefile;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,17 +13,29 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
 
     private boolean mTwoPane;
 
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
+
+    private static final String POSTER_GRID_FRAGMENT_TAG = "PGFTAG";
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private Uri mMovieUri;
+
+    private String mApiSortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        mApiSortOrder = Utility.getAPISortOrder(this);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_poster_grid, new PosterGridFragment(),
+                POSTER_GRID_FRAGMENT_TAG).commit();
+        }
 
         if (findViewById(R.id.movie_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
@@ -38,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.movie_detail_container, new MovieDetailActivityFragment(),
-                                DETAILFRAGMENT_TAG).commit();
+                                DETAIL_FRAGMENT_TAG).commit();
             }
             (this).onItemSelected();
         } else {
@@ -72,10 +82,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
     }
 
     private void updateMovies() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String sortOrder = prefs.getString(getString(R.string.pref_key_sort),
-                getString(R.string.pref_default_sort));
-        new FetchMoviesTask(this).execute(sortOrder);
+        new FetchMoviesTask(this).execute();
     }
 
     @Override
@@ -98,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         }
     }
@@ -117,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
             //Log.v(LOG_TAG, "In a single pane layout");
@@ -126,6 +133,21 @@ public class MainActivity extends AppCompatActivity implements MovieDetailActivi
                 Intent intent = new Intent(this, MovieDetailActivity.class).setData(mMovieUri);
                 startActivity(intent);
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String apiSortOrder = Utility.getAPISortOrder(this);
+        // update the location in our second pane using the fragment manager
+        if (apiSortOrder != null && !apiSortOrder.equals(mApiSortOrder)) {
+            PosterGridFragment ff = (PosterGridFragment)getSupportFragmentManager().
+                    findFragmentByTag(POSTER_GRID_FRAGMENT_TAG);
+            if ( null != ff ) {
+                ff.onSortChanged();
+            }
+            mApiSortOrder = apiSortOrder;
         }
     }
 }
