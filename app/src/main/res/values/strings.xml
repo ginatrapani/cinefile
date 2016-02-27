@@ -21,6 +21,6 @@
 
     <!-- SyncAdapter related -->
     <string name="sync_account_type">cinefile.ginatrapani.org</string>
-    <string name="content_authority">org.ginatrapani.cinefile</string>
+    <string name="content_authority">org.ginatrapani.cinefile.app</string>
 
 </resources>

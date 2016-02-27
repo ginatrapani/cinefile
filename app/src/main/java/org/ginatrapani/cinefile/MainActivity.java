@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements PosterGridFragmen
         } else {
             mTwoPane = false;
         }
+        CinefileSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override

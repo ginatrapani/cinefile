@@ -9,9 +9,12 @@ import android.util.Log;
  * Created by ginatrapani on 2/27/16.
  */
 public class CinefileSyncService extends Service {
-    private static final Object sSyncAdapterLock = new Object();
-    private static CinefileSyncAdapter sCinefileSyncAdapter = null;
+
     private final String LOG_TAG = CinefileSyncService.class.getSimpleName();
+
+    private static final Object sSyncAdapterLock = new Object();
+
+    private static CinefileSyncAdapter sCinefileSyncAdapter = null;
 
     @Override
     public void onCreate() {
