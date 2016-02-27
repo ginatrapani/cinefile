@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.ginatrapani.cinefile.data.FetchMoviesTask;
+import org.ginatrapani.cinefile.sync.CinefileSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements PosterGridFragment.Callback {
 
@@ -77,9 +77,8 @@ public class MainActivity extends AppCompatActivity implements PosterGridFragmen
         return super.onOptionsItemSelected(item);
     }
 
-    //@TODO Delete this once updates happen automatically
     private void updateMovies() {
-        new FetchMoviesTask(this).execute();
+        CinefileSyncAdapter.syncImmediately(this);
     }
 
     @Override
